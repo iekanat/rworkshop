@@ -1,0 +1,880 @@
+\documentclass{beamer}
+%\usepackage{times}  % fonts are up to you
+\usepackage{graphicx}
+\usepackage{multirow, booktabs} % Tables
+\usepackage[T1]{fontenc}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+\usepackage{url}
+\ifx\hypersetup\undefined
+  \AtBeginDocument{%
+    \hypersetup{unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=false}
+  }
+\else
+  \hypersetup{unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=false,pdfborder={0 0 0},backref=false,colorlinks=false}
+\fi
+
+% Get URLs to be colored
+\definecolor{links}{HTML}{990000}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
+
+%% GET KNITR OUTPUT TO SCRIPT SIZE
+\ifdefined\knitrout
+  \renewenvironment{knitrout}{\begin{scriptsize}}{\end{scriptsize}}
+\else
+\fi
+
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+\providecommand{\LyX}{\texorpdfstring%
+  {L\kern-.1667em\lower.25em\hbox{Y}\kern-.125emX\@}
+  {LyX}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+ % this default might be overridden by plain title style
+ \newcommand\makebeamertitle{\frame{\maketitle}}%
+ % (ERT) argument for the TOC
+
+
+
+% have this if you'd like a recurring outline
+\AtBeginSection[]  % "Beamer, do the following at the start of every section"
+{
+\begin{frame}<beamer> 
+\frametitle{Outline} % make a frame titled "Outline"
+\tableofcontents[currentsection]  % show TOC and highlight current section
+\end{frame}
+}
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\mode<presentation>
+\usetheme{CambridgeUS} 
+\usecolortheme{beaver}
+\makeatother
+
+\begin{document}
+<<setup, include=FALSE>>=
+library(knitr)
+library(ggplot2)
+library(e1071)
+opts_chunk$set(fig.path='figures/beamer-',fig.align='center',fig.show='hold',size='footnotesize')
+opts_chunk$set(tidy=TRUE)
+@
+
+\title[R Workshop]{How I Learned to Stop Worrying and Love the R Console}
+\author{Irfan Kanat \\
+    Department of Information Systems \\
+    Arizona State University 
+}
+\date{\today}
+
+
+
+\makebeamertitle
+
+
+\section{Introduction}
+
+\begin{frame}
+\frametitle{Who am I?}
+
+Irfan Kanat, PhD Candidate
+
+\vspace*{2em} R user since 2006
+
+\vspace*{2em} Open Source Evangelist
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{What is this about?}
+
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+		A brief introduction to R.
+		\vspace*{10pt}
+		\begin{itemize}
+		\item R Console
+		\item Importing Data
+		\item Packages
+		\item Sample analyses
+		\item Basic visualization
+		\item Where to get help?
+		\begin{itemize}
+		\item Documentation
+		\item Stack Exchange
+		\item R community
+		\end{itemize}
+		\end{itemize}
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\includegraphics[width=\textwidth]{./figures/R.png}
+	\end{column}
+\end{columns}	
+\end{frame}
+
+\begin{frame}
+\frametitle{What is R?}
+
+From R project web site:
+
+R is a language \emph{and} an environment for statistical computing and graphics. 
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+		\begin{itemize}
+		\vspace*{2em} \item Language %add additional functionality by defining new functions. Much of the system is itself written in the R
+		\vspace*{2em} \item Environment %The term “environment” is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
+		\vspace*{2em} \item Statistics and Visualization %  We prefer to think of it of an environment within which statistical techniques are implemented. R can be extended (easily) via packages
+		\end{itemize}
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\includegraphics[width=\textwidth]{./figures/R.png}
+	\end{column}
+\end{columns}	
+
+\end{frame}
+
+\begin{frame}
+\frametitle{What is R?}
+
+All this means R is very flexible, which played a huge role in its success.
+
+\vspace*{2em}
+My take: Low cost, high quality, open source solution for your analysis needs.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{When to Use R?}
+
+R is very strong for your classical machine learning and statistical analysis. Thousands of packages address almost all analysis needs. It is a logical first stop to start analysis.
+
+\pause 
+\vspace*{1.5em} Yet it's core design is starting to show its age. There are certain down sides to traditional R:
+
+\begin{itemize}
+\vspace*{1.5em} \item Everything is stored in memory\footnote{Except when it is not. There are packages to overcome these issues.}
+
+\vspace*{10pt} \item R is single core\footnotemark[1]
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Best Part of R}
+
+\textbf{Packages} CRAN houses over 7K packages. Providing functionality way beyond what is available in commercial packages.
+
+\vspace*{1.5em}\textbf{Community} Millions of users mean, all your questions are either already answered or will be in hours.
+
+\vspace*{1.5em}\textbf{Performance} While memory and core restrictions are real, for the cost of a single user license of a commercial package, you can buy better hardware to run R. Furthermore, with the packages providing multicore and flatfile functionality, R performance is on par or better than commercial packages
+
+\end{frame}
+
+\section{Familiar Examples}
+
+\begin{frame}[fragile]
+\frametitle{Logistic Regression}
+	<<echo=FALSE, results='hide'>>= 
+		admitData <- read.csv("http://www.ats.ucla.edu/stat/data/binary.csv")
+		admitData$rank <- as.factor(admitData$rank)
+	@
+
+	<<>>=
+		# Fit the model
+		logit_0 <- glm(admit~., admitData, family = "binomial") 
+		# Display fitted model
+		summary(logit_0)
+	@	
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Logistic Regression}
+	<<logitplot,fig.width=6,fig.height=4,out.width='.7\\linewidth', fig.align='center'>>=
+		ggplot(admitData, aes(x=gre, y=admit)) + 
+		    geom_point(aes(colour= rank )) +   
+		    stat_smooth(method="glm", family="binomial", , se=T)
+	@
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Support Vector Machine}
+	<<SVMplot,fig.width=6,fig.height=4,out.width='.7\\linewidth', fig.align='center'>>=
+		# Fit the model
+		svm_0<-svm(admit~., data=admitData, type="C-classification") 
+		# Plot the results
+		plot(svm_0, admitData, gre~gpa) # Let us plot the results
+	@	
+
+\end{frame}
+
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+\section{R Console}
+
+\begin{frame}
+\frametitle{Command Driven Interface}
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+	    Command line may be intimidating\vspace{1em}
+
+		Power or Convenience\vspace{1em}
+	    
+	    Consider the number of
+	    \begin{itemize}
+		    \item Functions
+		    \item Parameters
+		    \item Data sources
+		    \item Variables
+		    \item Replications
+	    \end{itemize}
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\onslide<2>{
+		\includegraphics[width=\textwidth]{./figures/GUIoverload.png}
+		}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{R Studio}
+
+	\includegraphics[width=\textwidth]{./figures/studio.png}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{New Project}
+\vfill
+File > New Project
+\vfill
+Empty Directory > Empty Project > Directory Name: Workshop
+\vfill
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{R as a Calculator}
+
+<<>>=
+# Arithmetics
+2+2
+
+2*3
+
+2^3
+
+log(100, 10)
+@
+
+<<>>=
+# Logic
+1 == 2
+
+1 != 2
+
+2 < 3
+@
+
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Variables}
+
+<<>>=
+A <- 2
+
+A
+
+a # Case sensitive
+
+'A' != 'a' # Explanation
+
+B <- 7
+
+A + B
+@
+
+<<>>=
+C <- c(1,3,7,9) # A list can be in a variable
+
+C
+
+C + A
+
+C * A
+
+C < 5
+@
+
+\end{frame}
+
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Indexes and Data Frames}
+
+<<>>=
+1:30
+
+C[3]
+
+C[c(2,3)]
+
+C[1:3]
+@
+
+<<tidy=FALSE>>=
+Countries <- data.frame(names=c("US","TR","DE"), supply=c(10, 8, 7), 
+			those=c(TRUE, FALSE, FALSE))
+
+Countries
+@
+
+<<>>=
+Countries[2,]
+
+Countries[,3]
+
+Countries[2,3]
+
+Countries[1:2,]
+@
+
+<<>>=
+Countries[ ,"names"]
+
+Countries$names
+
+Countries$those
+@
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Loops in R}
+{\Huge {\color{red} CAUTION!}}
+\vfill
+R is notoriously inefficient with your classic loops
+\vfill
+
+\begin{itemize}
+	\item Structure of the Data Frame
+	\item Memory Management
+\end{itemize}
+\vfill
+Try to use an apply function instead. 
+\vfill
+Vectorize your operations.
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{For Loop in R}
+<<>>=
+for (i in 1:3) print(i)
+
+# Iterating through a data frame
+for (i in 1:nrow(Countries)) {
+	print(Countries[i,])
+}
+@
+
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Functions}
+
+<<>>=
+ls() # List the contents of the environment
+
+mean(C) # Takes parameters
+
+mean(C, trim=.1, na.rm=T) # Takes multiple parameters
+
+log( sum(C)/length(C) ) # Can be combined
+@
+
+<<>>=
+HelloWorld<-function(x, y=1) {
+	for(i in 1:y) {
+		print(paste('Hello', x))
+	}
+}
+
+HelloWorld('MSBA')
+
+HelloWorld('MSBA', 2)
+@
+
+<<>>=
+HelloWorld # Review the source code
+ls
+@
+\end{frame}
+
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Commonly Used Functions}
+<<>>=
+ls() # Get a list of objects in the workspace
+
+ls(pattern='*_0') # partial match on object search
+
+rm('svm_0') # Remove an object from the workspace
+
+#rm(list=ls(pattern=ls())) # This would remove everything if ran
+
+
+@
+
+
+<<>>=
+mean(A) # Mean
+
+sd(admitData[,'gre']) # Standard Deviation
+
+AIC(logit_0)
+@
+
+
+
+<<size='tiny'>>=
+str(Countries) # Look at the structure of objects
+
+summary(Countries) # Get summary of data
+@
+
+<<>>=
+psych::describe(admitData) # Better version of summary stats in psych package
+@
+
+<<include=FALSE>>=
+logit_1 <- glm(admit~gre, admitData, family = "binomial") 
+@
+
+<<size='tiny'>>=
+summary(logit_1) # Get summary of model
+@
+
+<<fig.align='center',out.width='.6\\linewidth'>>=
+cor(admitData[,1:3]) # Get correlation matrix
+
+pairs(admitData) # Visualize correlation table
+@
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+
+\section{Importing Data}
+
+\begin{frame}
+\frametitle{Importing Data}
+
+R allows importing data from a wide variety of sources. \vspace{1em}
+
+\begin{itemize}
+\item Comma Separated Values (CSV)
+\item Databases
+\item Flat files
+\item Lesser statistical packages
+\item and more
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Importing CSV Files}
+
+CSV has certain advantages that make it popular.
+
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+		\begin{itemize}
+		\vspace{1.5em}
+		\item Compatibility
+		\item Flexibility
+		\item Simplicity
+		\end{itemize}
+	\end{column}
+	\begin{column}{.5\textwidth}
+		\begin{alertblock}{Sample}
+		{\scriptsize
+		"iso2", "Supply", "Those" \\
+		"AU",         20,       0 \\
+		"TR",         80,       1 \\
+		"US",        100,       0 \\
+		"GB",         50,       0 \\
+		"DE",         70,       0 \\
+		}
+		\end{alertblock}
+	\end{column}
+\end{columns}
+
+\vspace{1em}
+We use read.csv() or read.csv2() commands to import the csv files.
+
+	<<eval=FALSE>>=
+		saveData <- read.csv("PathToCSV", header=TRUE, sep="," 
+		                     , quote="\"", )
+	@
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Working with Excel Files}
+
+Much like CSV, except it lacks the simplicity, flexibility, and compatibility of CSV.
+
+<<eval=FALSE>>=
+# Load the necessary library
+library(xlsx)
+# Read in the data from excel file
+xlsx <- read.xlsx("country.xlsx", sheetIndex = 1)
+@
+
+\end{frame}
+
+
+\begin{frame}[c]
+\frametitle{Working with Databases}
+
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+		No speed advantage.\vspace{1em}
+
+		Data larger than memory.\vspace{1em}
+
+		Working with databases:
+		\begin{itemize}
+			\item Work in the database.
+			\item Import data from database.
+		\end{itemize}
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\includegraphics[width=.8\textwidth]{./figures/Database.png}
+	\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Working with Databases}
+
+	<<eval=FALSE>>=
+	# Load the necessary library
+	library(RMySQL) 
+	# Establish connection to the database.
+	channel <- dbConnect(MySQL(), user = 'uname', password = 'pwd', 
+                     host = '127.0.01', dbname='exampledata')
+	# Send query and save results in R workspace
+    sql <- dbGetQuery(channel, "SELECT * FROM table;") 
+	@
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Lesser Statistical Packages :P}
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+		\vspace{1em}
+		Foreign Package\vspace{1em}
+
+		Newer file formats\vspace{1em}
+		\begin{itemize}
+			\item sas7bdat
+			\item readstata13
+		\end{itemize}
+	\end{column}
+	\begin{column}{.5\textwidth}
+		\includegraphics[width=.8\textwidth]{./figures/lesser.png}
+	\end{column}
+\end{columns}
+
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+
+\section{Packages}
+
+\begin{frame}
+\frametitle{Packages: Source of R's Power}
+
+\begin{columns}[c]
+	\begin{column}{.5\textwidth}
+		Encountered already \vspace{1em}
+
+		Make R extendible \vspace{1em}
+
+		Like libraries \vspace{1em}
+
+		Collection of:
+		\begin{itemize}
+			\item functions
+			\item documentation
+			\item data files
+		\end{itemize}
+
+	\end{column}
+	\begin{column}{.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/packages.png}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Gifts from the Community}
+
+\begin{columns}[c]
+	\begin{column}{.5\textwidth}
+		Currently over 7000 packages \vspace{1em}
+
+		for
+		\begin{itemize}
+			\item Statistical Modeling
+			\item Machine Learning
+			\item Data Manipulation
+			\item Visualization
+			\item \ldots
+		\end{itemize}
+
+		from
+		\begin{itemize}
+			\item Economics
+			\item Computer Science
+			\item Statistics
+			\item Medicine
+			\item \ldots
+		\end{itemize}
+
+	\end{column}
+	\begin{column}{.5\textwidth}
+		\includegraphics[width=\textwidth]{figures/packages.png}
+	\end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Great but Where are My Gifts?}
+\vfill
+
+{\Huge Comprehensive R Archive Network (CRAN)}
+
+\vfill
+
+A Group of FTP and HTML servers hosting R packages.
+
+\vfill
+
+R has built in package management facilities.
+
+\vfill
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Package Management}
+
+<<eval=FALSE>>=
+# Installing a package
+install.packages("e1071")  # Notice the quotes around package name
+# Loading package into memory
+library(e1071) # Notice the lack of quotes
+# Unload package
+detach("package:e1071", unload=TRUE) # Notice the package: prepended
+@
+
+<<>>=
+# Get the list of packages loaded
+(.packages())
+# Get list of all installed packages (part of output omitted)
+.packages(all.available = T)
+@
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{How to Find Packages}
+
+If you want to search a certain word in installed packages' documentation, you can always use ?? or help.search()
+
+<<eval=FALSE, tidy=FALSE>>=
+??mixed
+help.search("mixed model")
+@
+
+Internet searches are a bit problematic as R can be a bit ambiguous until Google learns you are interested in the statistical computing environment.
+\vfill
+
+\href{https://cran.r-project.org/web/packages/}{Comprehensive R Archive Network (CRAN)}
+\vfill
+
+\href{https://r-forge.r-project.org/}{R Forge}
+\vfill
+
+\href{http://search.r-project.org}{R site search} also available with command RSiteSearch()
+\vfill
+\href{http://rseek.org/}{R seek}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Commonly Used Packages: Data Manipulation}
+
+\textbf{data.tables} Replaces traditional data.frame. 
+\begin{itemize}
+	\item Faster access/write
+	\item Improved selection 
+	\item Improved subsetting 
+	\item Improved aggregation 
+\end{itemize}
+
+Not a drop-in replacement as it breaks compatibility in some cases.
+
+\vspace{1em}
+
+\textbf{ddplyr}
+
+Additional functionality for:
+\begin{itemize}
+	\item selection
+	\item filtering
+	\item aggregation
+\end{itemize}
+
+Provides efficient back-end data structures to speed things up. 
+
+Works with databases as well.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Commonly Used Packages: Statistics}
+
+Multivariate Regression: Base package
+
+Generalized Linear Models: glm package \vfill
+
+Traditional Econometric Models: plm package \vfill
+
+Mixed Modeling: nlme and lme4 packages \vfill
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Commonly Used Packages: Machine Learning}
+
+Classifiers (KNN, LVQ): class package \vfill
+
+Support Vector Machines: kernlab, e1071 packages \vfill
+
+Clustering: Base package (kmeans(), hclust()), mclust package \vfill
+
+Neural Networks: neuralnet package.
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+\section{Sample Analysis and Visualizations}
+
+% Linear Regression
+
+% Logistic Regression
+
+% K means clustering?
+
+% Nearest Neighbor Classifier
+
+% SVM
+
+
+
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+\section{Reporting}
+
+
+
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+\section{Where to Go Next?}
+
+% EFFICIENT R PROGRAMMING
+
+\end{document}
