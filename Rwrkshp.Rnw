@@ -22,12 +22,6 @@
 \definecolor{links}{HTML}{990000}
 \hypersetup{colorlinks,linkcolor=,urlcolor=links}
 
-%% GET KNITR OUTPUT TO SCRIPT SIZE
-\ifdefined\knitrout
-  \renewenvironment{knitrout}{\begin{scriptsize}}{\end{scriptsize}}
-\else
-\fi
-
 
 \makeatletter
 
@@ -66,7 +60,7 @@
 library(knitr)
 library(ggplot2)
 library(e1071)
-opts_chunk$set(fig.path='figures/beamer-',fig.align='center',fig.show='hold',size='footnotesize')
+opts_chunk$set(fig.path='figures/beamer-',fig.align='center',fig.show='hold',size='scriptsize')
 opts_chunk$set(tidy=TRUE)
 @
 
@@ -239,7 +233,7 @@ R is very strong for your classical machine learning and statistical analysis. T
 	\begin{column}{.5\textwidth}
 	    Command line may be intimidating\vspace{1em}
 
-		Power or Convenience\vspace{1em}
+		Power over Convenience\vspace{1em}
 	    
 	    Consider the number of
 	    \begin{itemize}
@@ -803,7 +797,7 @@ Works with databases as well.
 \begin{frame}
 \frametitle{Commonly Used Packages: Statistics}
 
-Multivariate Regression: Base package
+Multivariate Regression: Base package \vfill
 
 Generalized Linear Models: glm package \vfill
 
@@ -838,6 +832,10 @@ Neural Networks: neuralnet package.
 \end{frame}
 
 \section{Sample Analysis and Visualizations}
+
+\begin{frame}
+
+\end{frame}
 
 % Linear Regression
 
