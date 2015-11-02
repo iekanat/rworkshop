@@ -1,6 +1,6 @@
 ---
 title: "Data Import"
-author: "Irfan"
+author: "Irfan Kanat"
 date: "October 12, 2015"
 output: pdf_document
 ---
