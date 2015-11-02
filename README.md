@@ -2,7 +2,7 @@
 
 This is a repository for the upcoming R Workshop. 
 
-Here I plan to host the Presentation, Documentation, data files and R code for the Workshop here in this git repository.
+Here I plan to host the Presentation, Documentation, data files and R code for the Workshop.
 
 There is a single presentation that covers the entirety of the workshop and a companion document for each section. You may be familiar with pdf documents which are the outputs you can read. 
 
