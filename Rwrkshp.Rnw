@@ -821,13 +821,19 @@ Mixed Modeling: nlme and lme4 packages \vfill
 \begin{frame}
 \frametitle{Commonly Used Packages: Machine Learning}
 
-Classifiers: caret\footnote{Caret package is a wrapper for a host of classification and regression model training functions. It eases visualizations, data manipulation, and analytics among others.}, and class packages \vfill
+Most probably all you need is caret package. 
 
-Support Vector Machines: kernlab, e1071 packages \vfill
+Caret package is a wrapper for a host of classification and regression model training functions. It eases visualizations, data manipulation, and analytics among others. It currently supports over 150 types of models.\vfill 
+If you insist on using individual packages:
 
-Clustering: Base package (kmeans(), hclust()), mclust package \vfill
+Classifiers: class package 
+
+Support Vector Machines: kernlab, e1071 packages 
+
+Clustering: Base package (kmeans(), hclust()), mclust package 
 
 Neural Networks: neuralnet package.
+\vfill
 
 \end{frame}
 
@@ -1073,13 +1079,17 @@ summary(logit_2)
 
 
 <<logitplot2,fig.width=6,fig.height=4,out.width='.9\\linewidth'>>=
-# Let us create a simulated dataset to plot out categorical age
+
+## Let us create a simulated dataset to predict effect of age
+# Create a dataset
 pima2 <- data.frame(glu = 61:180, ped = mean(Pima.tr$ped),
 					 age=rep(c(20,30,40,50), 30))
 # Get the predicted probabilities to plot
 pima2$pred <- predict(logit_2, newdata=pima2, type='response')
 # Declare age as categorical
 pima2$age <- as.factor(pima2$age)
+
+
 ## Plot the results, with categorical age as lines o.
 # Initialize the plot with probability on y axis and glucose on x
 ggplot(pima2, aes(x = glu, y = (pred))) + 
@@ -1100,11 +1110,68 @@ ggplot(pima2, aes(x = glu, y = (pred))) +
 
 % SVM
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Caret Package}
+
+The Caret package is a wrapper that combines functionality from 27 R packages.\vfill
+
+Functions Provided:
+\begin{itemize}
+	\item Visualization
+	\item Data Manipulation
+	\item Model Training \& Selection
+	\item Parallel Processing
+\end{itemize}
+\vfill
+
+Since so many packages involved, the installation takes a while.
+
+<<eval=FALSE>>=
+install.packages("caret", dependencies = c("Depends", "Suggests"))
+@
+
+For this part of the exercise I will focus on Caret Package, following its \href{https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf}{vignette}.
+\end{frame}
+
+
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Data Splitting}
+
+Let us obtain our dataset
+<<>>=
+# Dataset comes with mlbench package
+library(mlbench)
+# Load dataset into the current workspace
+data(Sonar)
+@
+\vfill
+
+208 observations and 61 variables\vfill
+
+Split the data into training and testing datasets, conserving the dependent variables' distribution.
+<<>>=
+set.seed(107) # Set random number seed for reproducibility
+# Create an index of observations to be included in Training
+indexTrain <- createDataPartition(y = Sonar$Class, p = .75, list = FALSE)
+
+# $plit the data 
+Train <- Sonar[indexTrain,]
+Test  <- Sonar[-indexTrain,]
+
+@
 
 \end{frame}
 
+
+\begin{frame}[fragile]
+\frametitle{Train a PLS Discriminant Model}
+
+<<>>=
+plsFit <- train(Class ~ ., data = Train, method = "pls",
+		# Center and scale the predictors
+		preProc = c("center", "scale"))
+@
+\end{frame}
 
 
 \begin{frame}
