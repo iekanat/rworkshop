@@ -91,6 +91,19 @@ Irfan Kanat, PhD Candidate
 
 
 \begin{frame}
+\frametitle{Before We Begin}
+{\Large
+Got R \& R Studio Installed? \vfill
+
+Get your workshop documents: \vfill
+
+\href{https://github.com/iekanat/rworkshop}{https://github.com/iekanat/rworkshop} \vfill
+
+}
+\end{frame}
+
+
+\begin{frame}
 \frametitle{What is this about?}
 
 \begin{columns}[T]
@@ -104,11 +117,6 @@ Irfan Kanat, PhD Candidate
 		\item Sample analyses
 		\item Basic visualization
 		\item Where to get help?
-		\begin{itemize}
-		\item Documentation
-		\item Stack Exchange
-		\item R community
-		\end{itemize}
 		\end{itemize}
 	\end{column}
 
@@ -121,15 +129,15 @@ Irfan Kanat, PhD Candidate
 \begin{frame}
 \frametitle{What is R?}
 
-From R project web site:
+From R project web site:\vfill
 
-R is a language \emph{and} an environment for statistical computing and graphics. 
+R is a language \emph{and} an environment for statistical computing and graphics. \vfill
 \begin{columns}[T]
 	\begin{column}{.5\textwidth}
 		\begin{itemize}
-		\vspace*{2em} \item Language %add additional functionality by defining new functions. Much of the system is itself written in the R
-		\vspace*{2em} \item Environment %The term “environment” is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
-		\vspace*{2em} \item Statistics and Visualization %  We prefer to think of it of an environment within which statistical techniques are implemented. R can be extended (easily) via packages
+		\vspace{.5em} \item Language %add additional functionality by defining new functions. Much of the system is itself written in the R
+		\vspace{.5em} \item Environment %The term “environment” is intended to characterize it as a fully planned and coherent system, rather than an incremental accretion of very specific and inflexible tools, as is frequently the case with other data analysis software.
+		\vspace{.5em} \item Statistics and Visualization %  We prefer to think of it of an environment within which statistical techniques are implemented. R can be extended (easily) via packages
 		\end{itemize}
 	\end{column}
 
@@ -137,32 +145,34 @@ R is a language \emph{and} an environment for statistical computing and graphics
 		\includegraphics[width=\textwidth]{./figures/R.png}
 	\end{column}
 \end{columns}	
+\vfill
 
 \end{frame}
 
 \begin{frame}
 \frametitle{What is R?}
 
-All this means R is very flexible, which played a huge role in its success.
+All this means R is very flexible, which played a huge role in its success.\vfill
 
-\vspace*{2em}
-My take: Low cost, high quality, open source solution for your analysis needs.
+My take: Low cost, high quality, open source solution for your analysis needs.\vfill
 
 \end{frame}
 
 \begin{frame}
 \frametitle{When to Use R?}
 
-R is very strong for your classical machine learning and statistical analysis. Thousands of packages address almost all analysis needs. It is a logical first stop to start analysis.
+R is very strong for your classical machine learning and statistical analysis. Thousands of packages address almost all analysis needs. It is a logical first stop to start analysis.\vfill
 
 \pause 
-\vspace*{1.5em} Yet it's core design is starting to show its age. There are certain down sides to traditional R:
+Yet it's core design is starting to show its age. There are certain down sides to traditional R:\vfill
 
 \begin{itemize}
-\vspace*{1.5em} \item Everything is stored in memory\footnote{Except when it is not. There are packages to overcome these issues.}
+\item Everything is stored in memory\footnote{\onslide<2>{Except when it is not. There are packages to overcome these issues.}}
+\vspace{1em}
 
-\vspace*{10pt} \item R is single core\footnotemark[1]
+\item R is single core\footnotemark[1]
 \end{itemize}
+\vfill
 
 \end{frame}
 
@@ -197,10 +207,10 @@ R is very strong for your classical machine learning and statistical analysis. T
 
 \begin{frame}[fragile]
 \frametitle{Logistic Regression}
-	<<logitplot,fig.width=6,fig.height=4,out.width='.7\\linewidth', fig.align='center'>>=
+	<<logitplot,fig.width=6,fig.height=4,out.width='.7\\linewidth'>>=
 		ggplot(admitData, aes(x=gre, y=admit)) + 
 		    geom_point(aes(colour= rank )) +   
-		    stat_smooth(method="glm", family="binomial", , se=T)
+		    stat_smooth(method="glm", family="binomial", se=T)
 	@
 \end{frame}
 
@@ -464,10 +474,6 @@ str(Countries) # Look at the structure of objects
 summary(Countries) # Get summary of data
 @
 
-<<>>=
-psych::describe(admitData) # Better version of summary stats in psych package
-@
-
 <<include=FALSE>>=
 logit_1 <- glm(admit~gre, admitData, family = "binomial") 
 @
@@ -478,8 +484,6 @@ summary(logit_1) # Get summary of model
 
 <<fig.align='center',out.width='.6\\linewidth'>>=
 cor(admitData[,1:3]) # Get correlation matrix
-
-pairs(admitData) # Visualize correlation table
 @
 
 \end{frame}
@@ -571,15 +575,16 @@ xlsx <- read.xlsx("country.xlsx", sheetIndex = 1)
 
 \begin{columns}[T]
 	\begin{column}{.5\textwidth}
-		No speed advantage.\vspace{1em}
+		No speed advantage.\vfill
 
-		Data larger than memory.\vspace{1em}
+		Data larger than memory.\vfill
 
 		Working with databases:
 		\begin{itemize}
 			\item Work in the database.
 			\item Import data from database.
 		\end{itemize}
+		\vfill
 	\end{column}
 
 	\begin{column}{.5\textwidth}
@@ -716,6 +721,10 @@ R has built in package management facilities.
 
 \vfill
 
+Most of these can be achieved through the R Studio GUI. (Area D, packages pane)
+
+\vfill
+
 \end{frame}
 
 
@@ -738,6 +747,7 @@ detach("package:e1071", unload=TRUE) # Notice the package: prepended
 .packages(all.available = T)
 @
 \end{frame}
+
 
 \begin{frame}[fragile]
 \frametitle{How to Find Packages}
@@ -797,9 +807,9 @@ Works with databases as well.
 \begin{frame}
 \frametitle{Commonly Used Packages: Statistics}
 
-Multivariate Regression: Base package \vfill
+Multivariate Regression: Stats package, lm() (loaded by default) \vfill
 
-Generalized Linear Models: glm package \vfill
+Generalized Linear Models: Stats package, glm() \vfill
 
 Traditional Econometric Models: plm package \vfill
 
@@ -811,7 +821,7 @@ Mixed Modeling: nlme and lme4 packages \vfill
 \begin{frame}
 \frametitle{Commonly Used Packages: Machine Learning}
 
-Classifiers (KNN, LVQ): class package \vfill
+Classifiers: caret\footnote{Caret package is a wrapper for a host of classification and regression model training functions. It eases visualizations, data manipulation, and analytics among others.}, and class packages \vfill
 
 Support Vector Machines: kernlab, e1071 packages \vfill
 
@@ -833,19 +843,267 @@ Neural Networks: neuralnet package.
 
 \section{Sample Analysis and Visualizations}
 
+\subsection{Descriptive Visualizations}
 \begin{frame}
+
+\frametitle{Motor Trends Dataset}
+
+\href{http://www.jstor.org/stable/2530428}{We will use 1974 Motor Trend dataset. It has 32 observations and 11 variables.} \vfill
+
+\begin{columns}[T]
+
+	\begin{column}{.5\textwidth}
+
+		\begin{itemize}
+			\item mpg: Miles per gallon
+			\item cyl: Number of cylinders
+			\item disp: Displacement
+			\item hp: Horse Power
+			\item drat: Rear axle ratio
+			\item wt: Weight
+		\end{itemize}
+
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+
+		\begin{itemize}
+			\item qsec: quarter mile time
+			\item vs: V - S 
+			\item am: 0 automatic, 1 manual
+			\item gear: Gears
+			\item carb: Number of carburetors
+		\end{itemize}
+
+	\end{column}
+\end{columns}
+\vfill
 
 \end{frame}
 
+
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Motor Trends Dataset}
+
+<<size='tiny'>>=
+summary(mtcars)
+@
+
+<<mtcarspairs,fig.width=4,fig.height=4,out.width='.54\\linewidth', size='tiny'>>=
+pairs(mtcars[,c('mpg', 'hp', 'am',  'cyl')]) # Visualize Correlations
+@
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Bar Charts}
+
+<<'bar0',fig.width=6,fig.height=2.8,out.width='.7\\linewidth'>>=
+# Load the Dataset
+data(mtcars)
+## ggplot2 package is already loaded, else library(ggplot2)
+
+## Simple plot of just the means
+# Initialize the plot with variables of interest
+ggplot(mtcars, aes(x = factor(gear), y = mpg)) +  
+# Instruct ggplot to plot bars of width .3
+	geom_bar(stat = "identity", width=0.3)
+@
+
+<<'bar1',fig.width=6,fig.height=4,out.width='.7\\linewidth'>>=
+
+# If we are interested in a third categorical variable vs:
+ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +  
+  stat_summary(fun.y=mean, position=position_dodge(), geom="bar")
+@
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Scatter Plots}
+
+<<'scatter1', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+# Initialize Plot
+ggplot(mtcars, aes(x=hp, y=mpg)) +
+# Instruct points to be plotted
+	geom_point()
+@
+
+<<'scatter2', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+ggplot(mtcars, aes(x=hp, y=mpg)) +
+# Put some color in those points
+	geom_point(aes(color=factor(cyl))) 
+@
+
+<<'scatter3', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+ggplot(mtcars, aes(x=hp, y=mpg)) +
+	geom_point(aes(color=factor(cyl))) +
+# Add a regression line
+	geom_smooth(method=lm)
+@
+
+\end{frame}
+
+
+
 % Linear Regression
+\subsection{Statistics}
+
+\begin{frame}
+\frametitle{Multivariate Regression}
+
+We will keep using motor trends data set.\vfill
+
+Pay close attention to how we specify the model. \vfill
+
+\begin{alertblock}{Formula}
+	\[
+		Y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \epsilon
+	\]
+\end{alertblock}
+\vfill
+
+\begin{alertblock}{R Model}
+	\[
+		Y \sim x_1 + x_2
+	\]
+\end{alertblock}
+\vfill
+
+This basic structure will remain constant across many R packages.\vfill 
+
+\end{frame}
+
+
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{MV Regression}
+
+
+<<size='tiny'>>=
+# Let us estimate body weight index
+mvreg_0 <- lmvreg_0 <- lm( mpg ~ hp + cyl + am, mtcars)
+summary(mvreg_0)
+@
+
+<<>>=
+# Access Fitted Values
+# View first 3 predictions
+mvreg_0$fitted.values[1:3]
+
+# Bonus: Are the residuals normally distributed
+shapiro.test(mvreg_0$residuals)
+
+# AIC of the model
+AIC(mvreg_0)
+@
+
+<<mvregplot,fig.width=6,fig.height=4,out.width='.7\\linewidth'>>=
+# Plot the fitted values against real values
+ggplot(mtcars, aes(x = mtcars$mpg, y = mvreg_0$fitted.values)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red")
+@
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Logistic Regression}
+
+
+\href{http://care.diabetesjournals.org/content/16/1/310.abstract}{We will use a well established dataset on Diabetes among Pima Indians During Pregnancy.} \vfill
+
+Variables are: 
+\begin{columns}[T]
+	\begin{column}{.5\textwidth}
+		\begin{itemize}
+			\item npreg: Number of times pregnant
+			\item glu: Plasma glucose concentration
+			\item bp: Diastolic blood pressure (mm Hg)
+			\item skin: Triceps skin fold thickness (mm)
+		\end{itemize}
+	\end{column}
+
+	\begin{column}{.5\textwidth}
+		\begin{itemize}
+			\item bmi: Body mass index (weight in kg/(height in m)$^2$)
+			\item ped: Diabetes pedigree function
+			\item age: Age (years)
+			\item type: Diabetic (yes, no)
+		\end{itemize}
+	\end{column}
+\end{columns}
+\vfill
+
+\end{frame}
 
 % Logistic Regression
+\begin{frame}
+\frametitle{Logistic Regression}
 
+Dependent variable will be type (binary). \vfill
+
+It is basically a regression with a binomial link function. \vfill
+
+\begin{alertblock}{Formula}
+\[
+log \left(\frac{p}{1-p} \right) = \beta_0 + \beta_1 x_1 + \epsilon
+\]
+\end{alertblock}
+
+\end{frame}
+
+
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Logit}
+
+<<tidy=F>>=
+library(MASS) # data file is part of MASS package
+
+data(Pima.tr) # Load data file
+
+??Pima.tr # Help on data file
+
+head(Pima.tr, 3) # Top 3 rows
+@
+
+<<size='tiny'>>=
+logit_2 <- glm(type ~ glu + ped + age, Pima.tr, family='binomial')
+summary(logit_2)
+@
+
+
+<<logitplot2,fig.width=6,fig.height=4,out.width='.9\\linewidth'>>=
+# Let us create a simulated dataset to plot out categorical age
+pima2 <- data.frame(glu = 61:180, ped = mean(Pima.tr$ped),
+					 age=rep(c(20,30,40,50), 30))
+# Get the predicted probabilities to plot
+pima2$pred <- predict(logit_2, newdata=pima2, type='response')
+# Declare age as categorical
+pima2$age <- as.factor(pima2$age)
+## Plot the results, with categorical age as lines o.
+# Initialize the plot with probability on y axis and glucose on x
+ggplot(pima2, aes(x = glu, y = (pred))) + 
+# Colored lines for each age category
+		geom_line(aes(colour = age), size = 1) + 
+# Rename the y axis label
+		ylab('Probability')
+@
+
+\end{frame}
+
+
+
+\subsection{Machine Learning}
 % K means clustering?
 
 % Nearest Neighbor Classifier
 
 % SVM
+
+\begin{frame}
+\frametitle{Caret Package}
+
+\end{frame}
 
 
 
@@ -874,5 +1132,14 @@ Neural Networks: neuralnet package.
 \section{Where to Go Next?}
 
 % EFFICIENT R PROGRAMMING
+
+% http://www.ats.ucla.edu/stat/r/
+
+% Documentation
+
+% Stack Exchange
+
+% R community
+
 
 \end{document}
