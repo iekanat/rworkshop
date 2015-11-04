@@ -803,7 +803,7 @@ Works with databases as well.
 \begin{frame}
 \frametitle{Commonly Used Packages: Statistics}
 
-Multivariate Regression: Stats package, lm() (loaded by default) \vfill
+Multiple Regression: Stats package, lm() (loaded by default) \vfill
 
 Generalized Linear Models: Stats package, glm() \vfill
 
@@ -943,7 +943,7 @@ ggplot(mtcars, aes(x=hp, y=mpg)) +
 \subsection{Statistics}
 
 \begin{frame}
-\frametitle{Multivariate Regression}
+\frametitle{Multiple Regression}
 
 We will keep using motor trends data set.\vfill
 
