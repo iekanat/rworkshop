@@ -416,8 +416,6 @@ for (i in 1:nrow(Countries)) {
 \frametitle{Functions}
 
 <<>>=
-ls() # List the contents of the environment
-
 mean(C) # Takes parameters
 
 mean(C, trim=.1, na.rm=T) # Takes multiple parameters
@@ -468,7 +466,7 @@ AIC(logit_0)
 
 
 
-<<size='tiny'>>=
+<<>>=
 str(Countries) # Look at the structure of objects
 
 summary(Countries) # Get summary of data
@@ -731,19 +729,17 @@ Most of these can be achieved through the R Studio GUI. (Area D, packages pane)
 \begin{frame}[fragile]
 \frametitle{Package Management}
 
-<<eval=FALSE>>=
+<<eval=FALSE, messages=-5>>=
 # Installing a package
 install.packages("e1071")  # Notice the quotes around package name
 # Loading package into memory
 library(e1071) # Notice the lack of quotes
 # Unload package
 detach("package:e1071", unload=TRUE) # Notice the package: prepended
-@
 
-<<>>=
 # Get the list of packages loaded
 (.packages())
-# Get list of all installed packages (part of output omitted)
+# Get list of all installed packages (output omitted)
 .packages(all.available = T)
 @
 \end{frame}
@@ -821,9 +817,10 @@ Mixed Modeling: nlme and lme4 packages \vfill
 \begin{frame}
 \frametitle{Commonly Used Packages: Machine Learning}
 
-Most probably all you need is caret package. 
+Most probably all you need is caret package. \vfill
 
-Caret package is a wrapper for a host of classification and regression model training functions. It eases visualizations, data manipulation, and analytics among others. It currently supports over 150 types of models.\vfill 
+Caret package is a wrapper for a host of classification and regression model training functions. It eases visualizations, data manipulation, and analytics among others. \href{http://topepo.github.io/caret/modelList.html}{It currently supports over 150 types of models.}\vfill 
+
 If you insist on using individual packages:
 
 Classifiers: class package 
@@ -902,25 +899,19 @@ pairs(mtcars[,c('mpg', 'hp', 'am',  'cyl')]) # Visualize Correlations
 
 
 \begin{frame}[fragile, allowframebreaks]
-\frametitle{Bar Charts}
+\frametitle{Histograms}
 
-<<'bar0',fig.width=6,fig.height=2.8,out.width='.7\\linewidth'>>=
-# Load the Dataset
-data(mtcars)
-## ggplot2 package is already loaded, else library(ggplot2)
-
-## Simple plot of just the means
-# Initialize the plot with variables of interest
-ggplot(mtcars, aes(x = factor(gear), y = mpg)) +  
-# Instruct ggplot to plot bars of width .3
-	geom_bar(stat = "identity", width=0.3)
+<<'bar0',fig.width=6,fig.height=3,out.width='.7\\linewidth'>>=
+data(mtcars) # Load the Dataset
+library(ggplot2) # Load the ggplot package
+# Nr of cars by number of gears
+qplot(factor(gear), data=mtcars, geom="bar")
 @
 
-<<'bar1',fig.width=6,fig.height=4,out.width='.7\\linewidth'>>=
-
+<<'bar1',fig.width=6,fig.height=4,out.width='.7\\linewidth', tidy=FALSE>>=
 # If we are interested in a third categorical variable vs:
-ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +  
-  stat_summary(fun.y=mean, position=position_dodge(), geom="bar")
+qplot(factor(gear), data=mtcars, geom="bar", fill=factor(am)) + 
+ggtitle('Nice Histogram') # This is how you add a title
 @
 \end{frame}
 
@@ -928,16 +919,13 @@ ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +
 \frametitle{Scatter Plots}
 
 <<'scatter1', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
-# Initialize Plot
-ggplot(mtcars, aes(x=hp, y=mpg)) +
-# Instruct points to be plotted
-	geom_point()
+# Two continuous variables
+qplot(hp, mpg, data=mtcars, color=factor(cyl))
 @
 
 <<'scatter2', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
-ggplot(mtcars, aes(x=hp, y=mpg)) +
-# Put some color in those points
-	geom_point(aes(color=factor(cyl))) 
+# Add two more variables represented by color and size of points
+qplot(hp, mpg, data=mtcars, color=factor(cyl), size=disp, alpha=.09)
 @
 
 <<'scatter3', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
@@ -1079,26 +1067,49 @@ summary(logit_2)
 
 
 <<logitplot2,fig.width=6,fig.height=4,out.width='.9\\linewidth'>>=
+## VISUALIZE EFFECT OF GLUCOSE ON DIABETES PROBABILITY 
+## FOR DIFFERENT AGE GROUPS
 
-## Let us create a simulated dataset to predict effect of age
-# Create a dataset
+# Create a dataset for different age groups
 pima2 <- data.frame(glu = 61:180, ped = mean(Pima.tr$ped),
 					 age=rep(c(20,30,40,50), 30))
-# Get the predicted probabilities to plot
+# Get the predicted probabilities of this dataset
 pima2$pred <- predict(logit_2, newdata=pima2, type='response')
-# Declare age as categorical
+# Declare age as categorical for plotting
 pima2$age <- as.factor(pima2$age)
 
 
-## Plot the results, with categorical age as lines o.
+## Plot the results, with lines for age groups.
+
 # Initialize the plot with probability on y axis and glucose on x
 ggplot(pima2, aes(x = glu, y = (pred))) + 
 # Colored lines for each age category
 		geom_line(aes(colour = age), size = 1) + 
-# Rename the y axis label
+# Bonus: rename the y axis label
 		ylab('Probability')
 @
 
+<<>>=
+## DIAGNOSTICS
+# Add the predicted probabilities as a variable
+Pima.tr$prob <- predict(logit_2, type='response') 
+# Create predictions based on probabilities (prevalance .34)
+Pima.tr$pred<-0 # Declare predictions
+Pima.tr[Pima.tr$prob >= .66, 'pred']<-1 # $et prediction to 1 when probability is high
+# See prediction vs truth
+table(Pima.tr[, c('pred','type')])
+@
+
+<<logitroc,fig.width=4,fig.height=4,out.width='.5\\linewidth', messages=-1>>=
+## ROC CURVE
+
+# Load the necessary library
+library(pROC)
+# Calculate the ROC curve using the predicted probability vs actual values
+logit_2_roc <- roc(type~prob, Pima.tr) 
+# Plot ROC curve
+plot(logit_2_roc)
+@
 \end{frame}
 
 
@@ -1137,40 +1148,75 @@ For this part of the exercise I will focus on Caret Package, following its \href
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{Data Splitting}
 
-Let us obtain our dataset
 <<>>=
+## OBTAIN DATASET
 # Dataset comes with mlbench package
 library(mlbench)
 # Load dataset into the current workspace
 data(Sonar)
+# 208 observations and 61 variables
 @
-\vfill
 
-208 observations and 61 variables\vfill
-
-Split the data into training and testing datasets, conserving the dependent variables' distribution.
 <<>>=
-set.seed(107) # Set random number seed for reproducibility
+## SPLIT THE DATA
+
+# caret provides functionality
+library(caret) 
+# Set random number seed for reproducibility
+set.seed(107) 
 # Create an index of observations to be included in Training
 indexTrain <- createDataPartition(y = Sonar$Class, p = .75, list = FALSE)
 
-# $plit the data 
+# $plit the data using the index
 Train <- Sonar[indexTrain,]
 Test  <- Sonar[-indexTrain,]
-
 @
 
 \end{frame}
 
 
-\begin{frame}[fragile]
+\begin{frame}[fragile,allowframebreaks]
 \frametitle{Train a PLS Discriminant Model}
 
-<<>>=
+<<tidy=FALSE, messages=-2>>=
+## Declare Tuning Control Parameters
+ctrl <- trainControl(method = "repeatedcv", # K-fold cross validation
+			        repeats = 3, # Repeat resampling 3 times
+                    classProbs = TRUE, # Calculate predicted prob for ROC
+                    summaryFunction = twoClassSummary) # Set performance metrics for binary
+
+## Train the Classifier
 plsFit <- train(Class ~ ., data = Train, method = "pls",
-		# Center and scale the predictors
-		preProc = c("center", "scale"))
+		tuneLength = 10,   # Number of component sets to be evaluated (more is better)
+		trControl = ctrl, # Use control parameters from above
+		metric = "ROC" ,  # Criteria ROC
+		preProc = c("center", "scale")) # Center and scale the predictors
 @
+
+<<size='tiny'>>=
+plsFit
+@
+
+<<plsFit, fig.width=6,fig.height=4,out.width='.6\\linewidth'>>=
+# evaluate the performance of different number of components extracted
+plot(plsFit)
+@
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Validate with Test Data}
+<<>>=
+plsPredict <- predict(plsFit, newdata = Test) # Predict results
+head(plsPredict) # View predictions
+head(Test$Class) # View actual$
+@
+
+<<size='tiny'>>=
+# Get confusion matrix (predicted vs actual)
+confusionMatrix(data = plsPredict, Test$Class) #$
+
+@
+
 \end{frame}
 
 

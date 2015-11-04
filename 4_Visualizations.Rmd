@@ -1,0 +1,133 @@
+---
+title: "Sample Visualization"
+author: "Irfan Kanat"
+date: "11/04/2015"
+output: 
+  pdf_document:
+    fig_width: 4
+    fig_height: 3
+    fig_caption: false
+---
+
+
+R has long been known for its extensive visualization capabilities. The number of packages that handle visualizations are many, yet ggplot shines among them all. Today I will focus on ggplot and discuss plotting histograms and scatter plots. I will purely focus on qplot function, and discuss ggplot structure only briefly.
+
+## Introducing the Dataset
+
+[In this document we will analyze the Motor Trends data.](http://www.jstor.org/stable/2530428) The dataset was compiled from 1974 issues of Motor Trends magazine and is included with R Base package.
+  
+Let us start with loading the dataset.
+  
+```{r}
+data(mtcars)
+```
+
+As we learned in the section on packages, you can querry the documentation for almost anything. Including the datasets included in packages. The document includes descriptions of the variables.
+
+```{r}
+?mtcars
+```
+
+Let us get a sense of the data.
+
+```{r}
+# A summary of variables
+summary(mtcars)
+# Correlation table for first 4 variables (due to space concerns)
+cor(mtcars[,1:4])
+# bivariate comparisons of categorical variables
+table(mtcars[,c("am","cyl")])
+```
+
+## Plotting with qplot()
+
+Now we can get to the fun part. qplot simplifies the ggplot functionality by automating most common tasks. We will use qplot for most common plots. 
+
+```{r}
+# Load the ggplot package
+library(ggplot2)
+# Review function syntax
+?qplot
+```
+
+### Histogram
+
+You would use a histogram you are interested in frequencies of certain categories, like number of people with certain eye color.
+
+```{r}
+# Numbers we should see for verification. 
+table(mtcars$gear)
+# Let us report the number of cars with differing number of front gears
+qplot(factor(gear), data=mtcars, geom="bar") # used factor to declare categorical
+```
+
+If we want to get fancy and want to report across two categorical variables we can color the bars based on another variable.
+
+```{r}
+qplot(factor(gear), data=mtcars,  fill=factor(am), geom="bar") # used factor to declare categorical
+```
+
+### Scatter Plots
+
+If you are interested in the relationship between two continuous variables, you can use scatter plots. 
+
+```{r}
+qplot(hp, mpg, data=mtcars)
+```
+
+Let us impose an additional factor into the plot. Let us color the dots by the number of cylinders.
+
+```{r}
+qplot(hp, mpg, data=mtcars, color=factor(cyl))
+```
+
+Size of dots dependent on a continuous variable (displacement).
+
+```{r}
+qplot(hp, mpg, data=mtcars, color=factor(cyl), size=disp, alpha=.08)
+```
+
+Let us fit a regression line. This is where things start to get a bit ggplotty.
+
+```{r}
+qplot(hp, mpg, data=mtcars) + 
+  geom_smooth(method=lm, sd=F)
+```
+
+## ggplot
+
+qplot provides a convenient command for plotting. While qplot would address 90% of your plotting needs. ggplot is way more than qplot, it is almost a different language just for plotting. The intricacies may be hard to learn and is clearly beyond the scope of this workshop. I am providing ggplot code below to achieve the same results as the qplot, so the attendees can get a sense of what ggplot is really about.
+
+### Histogram
+
+```{r}
+# Initialize the plot with variables of interest
+ggplot(mtcars, aes(factor(gear))) +  
+# Instruct ggplot to plot bars of width .3
+  geom_bar(stat = "bin", width=0.3) +
+  ggtitle('GGPlot is Highly Customizable') +
+  xlab('Forward Gears') +
+  ylab('Nr of Cars') 
+```
+
+### Scatter Plot
+
+```{r}
+ggplot(mtcars, aes(x=hp, y=mpg)) +  
+  geom_point(aes(color=factor(cyl), size=disp)) + # For scatter plot
+	geom_smooth(method=lm) + # Add a regression line
+  ggtitle('GGPlot FTW!') # Add a title
+```
+
+### BONUS: Bar Charts 
+
+You use bar charts when you want to visualize the relationship of a continuous variable over a categorical variable (eg. gender-height). Here I plot mean mpg over two categorical variables. 
+
+```{r}
+ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +  
+  stat_summary(fun.y=mean, position=position_dodge(), geom="bar")
+```
+
+## caret and Visualizations
+
+We will cover caret a little in machine learning samples. This package provides convenient shortcuts to ggplot functionality. Simplifying most common plotting tasks in machine learning. Please [refer to the project page](http://topepo.github.io/caret/visualizations.html) for further reference.
