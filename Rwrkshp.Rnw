@@ -914,17 +914,17 @@ ggtitle('Nice Histogram') # This is how you add a title
 \begin{frame}[fragile, allowframebreaks]
 \frametitle{Scatter Plots}
 
-<<'scatter1', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+<<'scatter0', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
 # Two continuous variables
 qplot(hp, mpg, data=mtcars, color=factor(cyl))
 @
 
-<<'scatter2', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+<<'scatter1', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
 # Add two more variables represented by color and size of points
 qplot(hp, mpg, data=mtcars, color=factor(cyl), size=disp, alpha=.09)
 @
 
-<<'scatter3', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+<<'scatter2', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
 ggplot(mtcars, aes(x=hp, y=mpg)) +
 	geom_point(aes(color=factor(cyl))) +
 # Add a regression line
@@ -933,10 +933,20 @@ ggplot(mtcars, aes(x=hp, y=mpg)) +
 
 \end{frame}
 
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Bar Charts}
+
+<<'bar2', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(am)), color=factor(am)) +  
+  stat_summary(fun.y=mean, position=position_dodge(), geom="bar")
+@
+
+\end{frame}
+
 
 
 % Linear Regression
-\subsection{Statistics}
+\subsection{Modeling}
 
 \begin{frame}
 \frametitle{Multiple Regression}
@@ -1091,8 +1101,6 @@ confusionMatrix(table(mtcars[,c("am", "pred")]))
 \end{frame}
 
 
-
-\subsection{Machine Learning}
 % K means clustering?
 
 % Nearest Neighbor Classifier
