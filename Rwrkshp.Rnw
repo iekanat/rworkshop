@@ -1217,6 +1217,16 @@ confusionMatrix(data = plsPredict, Test$Class) #$
 
 \section{Reporting}
 
+\begin{frame}
+\frametitle{Professional Looking Documents}
+
+All the documentation of this presentation has been prepared in R Studio. \vfill
+
+Look into the Rmd documents to see how this was done. \vfill
+
+summary function does not provide the best looking model summaries. Try the texreg package.\vfill
+
+\end{frame}
 
 
 \begin{frame}
@@ -1230,15 +1240,24 @@ confusionMatrix(data = plsPredict, Test$Class) #$
 
 \section{Where to Go Next?}
 
-% EFFICIENT R PROGRAMMING
+\begin{frame}
+\frametitle{Where to Go Next}
 
-% http://www.ats.ucla.edu/stat/r/
+8 hours is not enough! \vfill
 
-% Documentation
+RTFM\footnote{Read the Friendly Manual}: Documentation is your friend, read the vignettes and manuals.\vfill
 
-% Stack Exchange
+For tutorials: \href{http://www.ats.ucla.edu/stat/r/}{Institute For Digital Research and Education, UCLA} \vfill
 
-% R community
+For questions: StackExchange\footnote{Word of caution, \href{http://stackoverflow.com/help/how-to-ask}{pay attention to how you ask your questions}. It is more important than you realize.}
+\begin{itemize}
+\item \href{http://stats.stackexchange.com/}{Cross Validated specializes on Statistics}
+\item \href{http://stackoverflow.com/}{Stack Overflow for R programming}
+\end{itemize}
+\vfill
 
+R Programming is quirky, learn about efficient R programming.
+
+\end{frame}
 
 \end{document}
