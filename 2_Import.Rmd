@@ -33,7 +33,7 @@ help(read.csv)
 
 As you can see, the function takes quite a few parameters but most are optional with reasonable defaults (meaning you can safely leave them blank).
 
-You are provided with a file named "country.csv" (in the git repository)[https://github.com/iekanat/rworkshop]. If you placed this file in your project directory you can import its contents as follows.
+You are provided with a file named "country.csv" [in the git repository](https://github.com/iekanat/rworkshop). If you placed this file in your project directory you can import its contents as follows.
 
 ```{r,results='hide'}
 # Save file contents into a variable called csv
