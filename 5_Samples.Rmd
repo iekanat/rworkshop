@@ -1,5 +1,5 @@
 ---
-title: "Statistics"
+title: "Sample Analysis"
 author: "Irfan Kanat"
 date: "11/04/2015"
 output: 
@@ -9,9 +9,12 @@ output:
     fig_caption: false
 ---
 
+
+## Statistical Models
+
 In this section, I will try to provide an introduction to using two simple statistical models in R: regression and logistic regression.
 
-## Regression
+### Regression
 
 If your dependent variable is continuous you can simply use regression.
 
@@ -85,7 +88,7 @@ AIC(reg_1)
 anova(reg_0, reg_1) # models are significantly different
 ```
 
-## Logistic Regression
+### Logistic Regression
 
 Let us change gears and try to predict a binary variable. For this purpose we will use the logistic regression with a binomial link function. The model estimates the probability of Y=1.
 
@@ -152,3 +155,109 @@ logit_2_roc <- roc(am~prob, mtcars)
 # Plot ROC curve
 plot(logit_2_roc)
 ```
+
+
+## Model Training - Discriminant Analysis with caret Package
+
+In this document I will present a classification example using caret package. The example presented here follows closely [the caret package vignette](https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf). I only made a few changes to fit it into the workshop's time frame. So if you need any clarification, you can read up more in the vignette.
+
+Caret package is a wrapper that brings together functionality from 27 packages. Caret supports [estimating over 150 models](http://topepo.github.io/caret/bytag.html) including bayesian, SVM, discriminant analysis, regressions, neural networks, and more.
+
+```{r, eval=FALSE}
+# Run below commands to get a list of related packages
+available.packages()["caret","Depends"]
+available.packages()["caret","Suggests"]
+```
+
+Caret package aims to be the go to package for your predictive analytics needs. Thus it not only covers model training, but also data manipulation, visualization, and parallelization capabilities.
+
+Since so many packages involved, the installation takes a while.
+
+```{r ,eval=FALSE}
+install.packages("caret", dependencies = c("Depends", "Suggests"))
+```
+
+### Data
+
+We will use the sonar dataset from mlbench package. It has 208 observations of 60 predictor variables and a binary class variable as dependent. We do not know what these 60 variables are.
+
+```{r}
+# Dataset comes with mlbench package
+library(mlbench)
+# Load dataset into the current workspace
+data(Sonar)
+```
+
+### SPLIT THE DATA
+
+Caret provides functionality to split the data into a training and a testing set while at the same time preserving the distribution of dependent variable.
+
+createDataPartition function receives the dependent variable, proportion of training set in the whole of dataset as parameters.
+
+```{r}
+library(caret) # Load Library
+set.seed(107)  # Set random number seed for reproducibility
+# Create an index of observations to be included in Training
+indexTrain <- createDataPartition(y = Sonar$Class, p = .75, list = FALSE)
+
+# Split the data using the index
+Train <- Sonar[indexTrain,]
+Test  <- Sonar[-indexTrain,]
+```
+
+### Training a Discriminant Model
+
+We will be using a PLS DA model to train.
+
+First step is to set resampling and validation strategy. Here we are using 3 resamplings of 10-fold cross validation. We also configure the trainer to produce predicted probabilities to be used in ROC calculation.
+
+```{r}
+## Declare Tuning Control Parameters
+ctrl <- trainControl(method = "repeatedcv", # K-fold cross validation
+			        repeats = 3, # Repeat resampling 3 times
+                    classProbs = TRUE, # Calculate predicted prob for ROC
+                    summaryFunction = twoClassSummary) # Set performance metrics for binary
+```
+
+Below we train the model with varying parameters. The tune length in this case specifies maximum the number of components to be extracted.
+
+```{r}
+plsFit <- train(Class ~ ., data = Train, method = "pls",
+		tuneLength = 10,   # Number of component sets to be evaluated (more is better)
+		trControl = ctrl, # Use control parameters from above
+		metric = "ROC" ,  # Criteria ROC
+		preProc = c("center", "scale")) # Center and scale the predictors
+```
+
+Let us review the models that were fit.
+
+```{r}
+plsFit
+```
+
+As you can see the area under the ROC curve increases up to 4 components and starts declining afterwards. By default the model with 4 components is used.
+
+Plotting this fit would demonstrate the change in area under ROC for different components.
+
+```{r}
+# evaluate the performance of different number of components extracted
+plot(plsFit)
+```
+
+### Validate with Test Data
+
+Let us see how our fitted model performs with Test data.
+
+```{r}
+plsPredict <- predict(plsFit, newdata = Test) # Predict results
+head(plsPredict) # View predictions
+head(Test$Class) # View actual$
+```
+
+Get confusion matrix (predicted vs actual) for performance reports.
+
+```{r}
+confusionMatrix(data = plsPredict, Test$Class)
+```
+
+
