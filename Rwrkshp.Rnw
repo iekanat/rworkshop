@@ -579,9 +579,9 @@ xlsx <- read.xlsx("country.xlsx", sheetIndex = 1)
 
 \begin{columns}[T]
 	\begin{column}{.5\textwidth}
-		No speed advantage.\vfill
+		No speed advantage.\vspace{1em}
 
-		Data larger than memory.\vfill
+		Data larger than memory.\vspace{1em}
 
 		Working with databases:
 		\begin{itemize}
