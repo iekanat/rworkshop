@@ -228,7 +228,7 @@ Below are a logistic regression and a support vector machine example. You should
 
 ### Get the Dataset
 
-Here I will use data from (UCLA Institute of digital research and education web site)[http://www.ats.ucla.edu/stat/r/] which presents a very valuable resource for traditional statisitics.
+Here I will use data from [UCLA Institute of digital research and education web site](http://www.ats.ucla.edu/stat/r/) which presents a very valuable resource for traditional statisitics.
 
 The dataset is about graduate school admissions. The dependent variable is acceptance into school, dependent variables are GRE, GPA scores, and prestige of undergrad institution. 
 
