@@ -18,4 +18,8 @@ Currently I only uploaded the files related to the first session as I plan to ch
 
 [Packages](3_packages.pdf) provides a look at what packages are, how to get them, and briefly introduces some of the more common packages.
 
+[Visualization](4_Visualizations.pdf) an introduction to ggplot2 package with simple examples on histograms, scatterplots, and barcharts.
+
+[Analysis Examples](5_Samples.pdf) three short tutorials on regression, logistic regression, and classifier training in R.
+
 [Presentation](Rwrkshp.pdf) is the slide deck for the whole workshop.
