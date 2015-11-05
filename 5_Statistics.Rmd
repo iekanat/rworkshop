@@ -1,0 +1,154 @@
+---
+title: "Statistics"
+author: "Irfan Kanat"
+date: "11/04/2015"
+output: 
+  pdf_document:
+    fig_width: 4
+    fig_height: 3
+    fig_caption: false
+---
+
+In this section, I will try to provide an introduction to using two simple statistical models in R: regression and logistic regression.
+
+## Regression
+
+If your dependent variable is continuous you can simply use regression.
+
+For this demonstration, I will use the same Motor Trends dataset I used in Visualization section. 
+
+```{r}
+data(mtcars) # Get the data
+?mtcars # Help on dataset
+```
+
+We will use lm() function to fit regular regression.
+
+```{r}
+?lm
+```
+
+Below I declare a model where I use horse power, cylinders, and transmission type to estimate gas milage. Pay attention to model specification:
+
+```
+mpg ~ hp + cyl + am
+```
+
+Here the left hand side of the tilde is the dependent variable. and the right hand side has all the predictors we use separated by plus signs.
+
+```{r}
+# Fit 
+reg_0 <- lm( mpg ~ hp + cyl + am, data = mtcars) 
+summary(reg_0)
+```
+
+Look at the R-squared value to see how much variance is explained by the model, the more the better.
+
+You can access estimated values as follows. I used a head function to limit the output.
+
+```{r}
+head(reg_0$fitted.values)
+```
+
+You can use the fitted model to predict new datasets. Here I am modifying Datsun710 to see how the gas milage may have been influenced if the car was automatic instead of manual transmission.
+
+```{r}
+newCar <- mtcars[3,] # 3rd observation is Datsun 710
+newCar$am <- 0 # What if it was automatic?
+predict(reg_0, newdata = newCar) # Estimate went down by 4 miles
+```
+
+One way to see how your model did is to plot residuals. Ideally the residuals should be close to 0 and randomly distributed. If you see a pattern, it indicates misspecification.
+
+```{r}
+library(ggplot2)
+# Plot the fitted values against real values
+qplot(data=mtcars, x = mpg, y = reg_0$residuals) +
+  stat_smooth(method = "lm", col = "red")
+
+# Are the residuals normally distributed? 
+shapiro.test(reg_0$residuals) # yes
+```
+
+Comparing models. If you are using the same dataset, and just adding or removing variables to a model. You can compare models with a likelihood ratio test or an F test. Anova facilitates comparison of simple regression models.
+
+```{r}
+# Add variable wt
+reg_1 <- lm( mpg ~ hp + cyl + am + wt, mtcars)
+
+# Aikikae Information Criteria
+# AIC lower the better
+AIC(reg_0)
+AIC(reg_1)
+
+# Compare
+anova(reg_0, reg_1) # models are significantly different
+```
+
+## Logistic Regression
+
+Let us change gears and try to predict a binary variable. For this purpose we will use the logistic regression with a binomial link function. The model estimates the probability of Y=1.
+
+Let us stick to the mtcars dataset and try to figure out if a car is automatic or manual based on predictors.
+
+We will use glm function.
+
+```{r}
+?glm
+```
+
+Let us fit the model
+
+```{r}
+logit_2 <- glm(am ~ mpg + drat + cyl, data = mtcars, family='binomial')
+summary(logit_2)
+```
+
+Visualize the results.
+
+```{r}
+ggplot(mtcars, aes(x = mpg, y = am)) + 
+    stat_smooth(method="glm", family="binomial", se=FALSE)+
+# Bonus: rename the y axis label
+		ylab('Probability of Manual Transmission')
+```
+
+How about plotting results for number of cylinders? We will need to process the data a little bit.
+
+```{r}
+# Create a new dataset with varying number of cylinders and other variables fixed at mean levels.
+mtcars2<-data.frame(mpg = rep(10:30, 3),drat = mean(mtcars$drat), disp = mean(mtcars$disp), cyl = rep(c(4,6,8),21))
+# Predict probability of new data
+mtcars2$prob<-predict(logit_2, newdata=mtcars2, type = "response")
+
+# Plot the results
+ggplot(mtcars2, aes(x=mpg, y=prob)) +
+  geom_line(aes(colour = factor(cyl)), size = 1) 
+```
+
+Diagnostics with logistic regression.
+
+```{r}
+library(caret)
+
+# Let us compare predicted values to real values
+mtcars$prob <- predict(logit_2, type="response")
+# Prevalence of Manual Transmission
+mean(mtcars$am)
+
+# Create predict variable
+mtcars$pred <- 0
+# If probability is greater than .6 (1-prevalence), set prediction to 1
+mtcars[mtcars$prob>.6, 'pred'] <- 1
+
+# Confusion Matrix
+confusionMatrix(table(mtcars[,c("am", "pred")]))
+
+## ROC CURVE
+# Load the necessary library
+library(pROC)
+# Calculate the ROC curve using the predicted probability vs actual values
+logit_2_roc <- roc(am~prob, mtcars) 
+# Plot ROC curve
+plot(logit_2_roc)
+```

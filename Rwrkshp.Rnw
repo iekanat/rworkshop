@@ -62,6 +62,7 @@ library(ggplot2)
 library(e1071)
 opts_chunk$set(fig.path='figures/beamer-',fig.align='center',fig.show='hold',size='scriptsize')
 opts_chunk$set(tidy=TRUE)
+rm(list=ls()) # Clean the workspace
 @
 
 \title[R Workshop]{How I Learned to Stop Worrying and Love the R Console}
@@ -847,16 +848,14 @@ Neural Networks: neuralnet package.
 \section{Sample Analysis and Visualizations}
 
 \subsection{Descriptive Visualizations}
-\begin{frame}
 
+\begin{frame}
 \frametitle{Motor Trends Dataset}
 
 \href{http://www.jstor.org/stable/2530428}{We will use 1974 Motor Trend dataset. It has 32 observations and 11 variables.} \vfill
 
 \begin{columns}[T]
-
 	\begin{column}{.5\textwidth}
-
 		\begin{itemize}
 			\item mpg: Miles per gallon
 			\item cyl: Number of cylinders
@@ -865,11 +864,9 @@ Neural Networks: neuralnet package.
 			\item drat: Rear axle ratio
 			\item wt: Weight
 		\end{itemize}
-
 	\end{column}
 
 	\begin{column}{.5\textwidth}
-
 		\begin{itemize}
 			\item qsec: quarter mile time
 			\item vs: V - S 
@@ -877,7 +874,6 @@ Neural Networks: neuralnet package.
 			\item gear: Gears
 			\item carb: Number of carburetors
 		\end{itemize}
-
 	\end{column}
 \end{columns}
 \vfill
@@ -969,66 +965,51 @@ This basic structure will remain constant across many R packages.\vfill
 
 
 \begin{frame}[fragile,allowframebreaks]
-\frametitle{MV Regression}
+\frametitle{Regression}
 
 
 <<size='tiny'>>=
-# Let us estimate body weight index
-mvreg_0 <- lmvreg_0 <- lm( mpg ~ hp + cyl + am, mtcars)
-summary(mvreg_0)
+# Let us estimate gas milage
+reg_0 <- lm( mpg ~ hp + cyl + am, mtcars)
+summary(reg_0)
 @
 
 <<>>=
 # Access Fitted Values
 # View first 3 predictions
-mvreg_0$fitted.values[1:3]
+reg_0$fitted.values[1:3]
 
 # Bonus: Are the residuals normally distributed
-shapiro.test(mvreg_0$residuals)
+shapiro.test(reg_0$residuals)
+@
 
+<<>>=
+# PREDICTING NEW DATA BASED ON MODEL
+newCar <- mtcars[3,] # 3rd observation is Datsun 710
+newCar$am <- 0 # What if it was automatic?
+reg_0$fitted.values[3] # Previous estimate
+predict(reg_0, newdata = newCar) # Datsun with automatic transmission
+@ 
+
+<<regplot, tidy=F, fig.width=6,fig.height=4,out.width='.7\\linewidth'>>=
+## Plot the residuals against observation
+qplot(data=mtcars, x = mpg, y = reg_0$residuals) + #$
+	stat_smooth(method = "lm", col = "red") 
+@
+
+<<>>=
+## COMPARE MODELS
+reg_1 <- lm( mpg ~ hp + cyl + am + wt, mtcars) # add weight
+anova(reg_0, reg_1)
 # AIC of the model
-AIC(mvreg_0)
-@
-
-<<mvregplot,fig.width=6,fig.height=4,out.width='.7\\linewidth'>>=
-# Plot the fitted values against real values
-ggplot(mtcars, aes(x = mtcars$mpg, y = mvreg_0$fitted.values)) + 
-  geom_point() +
-  stat_smooth(method = "lm", col = "red")
+AIC(reg_0)
+AIC(reg_1)
+# Also the R-square
 @
 
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Logistic Regression}
-
-
-\href{http://care.diabetesjournals.org/content/16/1/310.abstract}{We will use a well established dataset on Diabetes among Pima Indians During Pregnancy.} \vfill
-
-Variables are: 
-\begin{columns}[T]
-	\begin{column}{.5\textwidth}
-		\begin{itemize}
-			\item npreg: Number of times pregnant
-			\item glu: Plasma glucose concentration
-			\item bp: Diastolic blood pressure (mm Hg)
-			\item skin: Triceps skin fold thickness (mm)
-		\end{itemize}
-	\end{column}
-
-	\begin{column}{.5\textwidth}
-		\begin{itemize}
-			\item bmi: Body mass index (weight in kg/(height in m)$^2$)
-			\item ped: Diabetes pedigree function
-			\item age: Age (years)
-			\item type: Diabetic (yes, no)
-		\end{itemize}
-	\end{column}
-\end{columns}
-\vfill
-
-\end{frame}
 
 % Logistic Regression
 \begin{frame}
@@ -1050,54 +1031,45 @@ log \left(\frac{p}{1-p} \right) = \beta_0 + \beta_1 x_1 + \epsilon
 \begin{frame}[fragile,allowframebreaks]
 \frametitle{Logit}
 
-<<tidy=F>>=
-library(MASS) # data file is part of MASS package
-
-data(Pima.tr) # Load data file
-
-??Pima.tr # Help on data file
-
-head(Pima.tr, 3) # Top 3 rows
-@
 
 <<size='tiny'>>=
-logit_2 <- glm(type ~ glu + ped + age, Pima.tr, family='binomial')
+logit_2 <- glm(am ~ mpg + drat + cyl, data = mtcars, family='binomial')
 summary(logit_2)
 @
 
-
-<<logitplot2,fig.width=6,fig.height=4,out.width='.9\\linewidth'>>=
-## VISUALIZE EFFECT OF GLUCOSE ON DIABETES PROBABILITY 
-## FOR DIFFERENT AGE GROUPS
-
-# Create a dataset for different age groups
-pima2 <- data.frame(glu = 61:180, ped = mean(Pima.tr$ped),
-					 age=rep(c(20,30,40,50), 30))
-# Get the predicted probabilities of this dataset
-pima2$pred <- predict(logit_2, newdata=pima2, type='response')
-# Declare age as categorical for plotting
-pima2$age <- as.factor(pima2$age)
+<<logitplot2,fig.width=6,fig.height=4,out.width='.7\\linewidth', warnings=FALSE, tidy=FALSE>>=
+# VISUALIZE mpg - Transmission RELATION
+ggplot(mtcars, aes(x = mpg, y = am)) +  
+  	stat_smooth(method="glm", family="binomial", se=FALSE) #
+@
 
 
-## Plot the results, with lines for age groups.
+<<logitplot3,fig.width=6,fig.height=4,out.width='.9\\linewidth'>>=
+## VISUALIZE Mpg - Transmission
+## FOR DIFFERENT NUMBERS OF CYLINDERS
 
-# Initialize the plot with probability on y axis and glucose on x
-ggplot(pima2, aes(x = glu, y = (pred))) + 
-# Colored lines for each age category
-		geom_line(aes(colour = age), size = 1) + 
-# Bonus: rename the y axis label
-		ylab('Probability')
+# Create a new dataset with varying number of cylinders and other variables fixed at mean levels.
+mtcars2<-data.frame(mpg = rep(10:30, 3),drat = mean(mtcars$drat), disp = mean(mtcars$disp), cyl = rep(c(4,6,8),21))
+# Predict probability of new data
+mtcars2$prob<-predict(logit_2, newdata=mtcars2, type = "response")
+
+# Plot the results
+ggplot(mtcars2, aes(x=mpg, y=prob)) +
+  geom_line(aes(colour = factor(cyl)), size = 1) # a different color for each category$
 @
 
 <<>>=
 ## DIAGNOSTICS
-# Add the predicted probabilities as a variable
-Pima.tr$prob <- predict(logit_2, type='response') 
-# Create predictions based on probabilities (prevalance .34)
-Pima.tr$pred<-0 # Declare predictions
-Pima.tr[Pima.tr$prob >= .66, 'pred']<-1 # $et prediction to 1 when probability is high
-# See prediction vs truth
-table(Pima.tr[, c('pred','type')])
+
+# Let us compare predicted values to real values
+mtcars$prob <- predict(logit_2, type="response")
+# Prevalence of Manual Transmission
+mean(mtcars$am)
+
+# Create predict variable
+mtcars$pred <- 0
+# If probability is greater than .6 (1-prevalence), set prediction to 1
+mtcars[mtcars$prob>.6, 'pred'] <- 1
 @
 
 <<logitroc,fig.width=4,fig.height=4,out.width='.5\\linewidth', messages=-1>>=
@@ -1106,10 +1078,16 @@ table(Pima.tr[, c('pred','type')])
 # Load the necessary library
 library(pROC)
 # Calculate the ROC curve using the predicted probability vs actual values
-logit_2_roc <- roc(type~prob, Pima.tr) 
+logit_2_roc <- roc(am~prob, mtcars) 
 # Plot ROC curve
 plot(logit_2_roc)
 @
+
+<<size='tiny'>>=
+library(caret) # Needed for Confusion Matrix
+confusionMatrix(table(mtcars[,c("am", "pred")]))
+@
+
 \end{frame}
 
 
