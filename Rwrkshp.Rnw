@@ -91,7 +91,7 @@ Irfan Kanat, PhD Candidate
 \end{frame}
 
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{Before We Begin}
 {\Large
 Got R \& R Studio Installed? \vfill
@@ -99,6 +99,11 @@ Got R \& R Studio Installed? \vfill
 Get your workshop documents: \vfill
 
 \href{https://github.com/iekanat/rworkshop}{https://github.com/iekanat/rworkshop} \vfill
+
+Install caret package:
+<<eval=FALSE>>=
+install.packages("caret", dependencies = c("Depends", "Suggests"))
+@
 
 }
 \end{frame}
