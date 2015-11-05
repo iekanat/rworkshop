@@ -189,7 +189,7 @@ Yet it's core design is starting to show its age. There are certain down sides t
 
 \end{frame}
 
-\section{Familiar Examples}
+\subsection{Familiar Examples}
 
 \begin{frame}[fragile]
 \frametitle{Logistic Regression}
@@ -1220,11 +1220,12 @@ confusionMatrix(data = plsPredict, Test$Class) #$
 \begin{frame}
 \frametitle{Professional Looking Documents}
 
-All the documentation of this presentation has been prepared in R Studio. \vfill
+All the documentation of this workshop has been prepared in R Studio. \vfill
 
 Look into the Rmd documents to see how this was done. \vfill
 
-summary function does not provide the best looking model summaries. Try the texreg package.\vfill
+summary() function does not provide the best looking model summaries.
+Try the texreg package (do as I say, not as I do).\vfill
 
 \end{frame}
 
@@ -1241,7 +1242,7 @@ summary function does not provide the best looking model summaries. Try the texr
 \section{Where to Go Next?}
 
 \begin{frame}
-\frametitle{Where to Go Next}
+\frametitle{Quo Vadis?}
 
 8 hours is not enough! \vfill
 
