@@ -70,7 +70,7 @@ help.search("mixed model")
 
 #### data.table
 
-This package is a replacement of the data.frame package. It is not a drop-in replacement and is not fully compatible with all data.frame functionality. So you need to be careful when you use it.
+This package is a replacement of the data.frame data structure. It is not a drop-in replacement and is not fully compatible with all data.frame functionality. So you need to be careful when you use it.
 
 It replaces data.frame with a data structure that is more efficient. Meaning it is faster when accessing and writing into data.tables.
 
@@ -84,11 +84,7 @@ Another benefit is, it can directly work with data stored in databases. So you c
 
 ### Statistics
 
-R base package (that comes loaded) includes your basic statistics such as multivariate regressions.
-
-#### Generalized Linear Models
-
-For more advanced models with alternate link functions you can use glm package. You can easily specify the link function family (binomial for logit for example) in the parameters.
+R base package (that comes loaded) includes your basic statistics such as multiple regressions and Generalized Linear Models.
 
 #### Panel Data Econometrics
 
@@ -100,9 +96,12 @@ Two packages, nlme and lme4 handle this bit. The development on nlme has slowed 
 
 ### Machine Learning
 
+caret package provides a nice set of functions for almost all predictive analytics needs. It is discussed in deeper detail in Example Analysis. 
+
 #### Classifiers (KNN, LVQ)
 
 K Nearest Neighbor matching and Learning Vector Quantization and more are available through class package.
+
 
 #### Support Vector Machines
 
