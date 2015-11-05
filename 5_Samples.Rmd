@@ -1,5 +1,5 @@
 ---
-title: "Sample Analysis"
+title: "Example Analysis"
 author: "Irfan Kanat"
 date: "11/04/2015"
 output: 
@@ -235,7 +235,7 @@ Let us review the models that were fit.
 plsFit
 ```
 
-As you can see the area under the ROC curve increases up to 4 components and starts declining afterwards. By default the model with 4 components is used.
+As you can see the area under the ROC curve increases up till 4 components and starts declining afterwards. By default the model with 4 components is used.
 
 Plotting this fit would demonstrate the change in area under ROC for different components.
 
