@@ -1261,4 +1261,14 @@ R Programming is quirky, learn about efficient R programming.
 
 \end{frame}
 
+\begin{frame}
+	\frametitle{Questions}
+	\begin{center}
+		\vfill
+			\resizebox{!}{.75\textheight}{\color{red} ?}
+		\vfill
+	\end{center}
+\end{frame}
+
+
 \end{document}
