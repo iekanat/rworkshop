@@ -1,5 +1,5 @@
 ---
-title: "Sample Visualization"
+title: "Visualization with ggplot2"
 author: "Irfan Kanat"
 date: "11/04/2015"
 output: 
@@ -10,7 +10,7 @@ output:
 ---
 
 
-R has long been known for its extensive visualization capabilities. The number of packages that handle visualizations are many, yet ggplot shines among them all. Today I will focus on ggplot and discuss plotting histograms and scatter plots. I will purely focus on qplot function, and discuss ggplot structure only briefly.
+R has long been known for its extensive visualization capabilities. The number of packages that handle visualizations are many, yet ggplot shines among them all. Today I will focus on ggplot and discuss plotting histograms and scatter plots with qplot. I will focus mostly on qplot() function, and discuss ggplot structure only briefly.
 
 ## Introducing the Dataset
 
@@ -37,6 +37,9 @@ summary(mtcars)
 cor(mtcars[,1:4])
 # bivariate comparisons of categorical variables
 table(mtcars[,c("am","cyl")])
+
+# The histogram below should reflect these figures. 
+table(mtcars$gear)
 ```
 
 ## Plotting with qplot()
@@ -52,11 +55,9 @@ library(ggplot2)
 
 ### Histogram
 
-You would use a histogram you are interested in frequencies of certain categories, like number of people with certain eye color.
+You would use a histogram when you are interested in frequencies of certain categories, like number of people with different eye colors.
 
 ```{r}
-# Numbers we should see for verification. 
-table(mtcars$gear)
 # Let us report the number of cars with differing number of front gears
 qplot(factor(gear), data=mtcars, geom="bar") # used factor to declare categorical
 ```
