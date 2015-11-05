@@ -937,7 +937,7 @@ ggplot(mtcars, aes(x=hp, y=mpg)) +
 \frametitle{Bar Charts}
 
 <<'bar2', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
-ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(am)), color=factor(am)) +  
+ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +  
   stat_summary(fun.y=mean, position=position_dodge(), geom="bar")
 @
 
