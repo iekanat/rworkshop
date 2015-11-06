@@ -63,7 +63,7 @@ As you can see, in the second row the index shifts to [24] indicating the 24th n
 If you want to save anything in the environment to use later; be it a variable, data, results. You can use the assignment operator '<-'
 
 ```{r}
-A<-5
+A <- 5
 ```
 
 Notice there is no output. R merely saved 5 into memory as A. So A is a shortcut (variable) for 5. We can use it in ways displayed below.
@@ -74,10 +74,18 @@ A+2
 A*2
 ```
 
+Here it is time to point out to a feature of R console. It is case sensitive.
+
+```{r, }
+# a
+# Explanation
+"a" != "A"
+```
+
 We can also store a vector (array of numbers) in a variable. Here I am saving numbers 1 to 10 in B.
 
 ```{r}
-B<-1:10
+B <- 1:10
 ```
 
 Notice the lack of output.
@@ -168,8 +176,18 @@ D$fac
 Now think about a situation. Where the third column (fac) is the user ID and you want all transactions of a specific user. We can use the logic operators we learned about earlier to obtain just that. Let us extract the observations relating to user C .
 
 ```{r}
-D[D$fac=='C',] # This translates to "From d, select all rows where column fac equals 'C'". 
+D[D$fac=='C',] # This translates to "From D, select all rows where column fac equals 'C'". 
 ```
+
+
+## Loops in R
+
+R can be pretty inefficient with loops, try to vectorize your operations and use apply functions instead. After that warning, here is how you loop in R.
+
+```{r}
+for(i in C){print(i)}
+```
+
 
 ## Functions
 
@@ -178,7 +196,7 @@ So now you know about assignment operators (<-, ->, =), logical operators (==, <
 A basic R function is just a word followed by parentheses. Between the brackets are the options (parameters) of the function. The function below prints R license information to the screen. It takes no parameters.
 
 ```{r}
-license()
+license() #Source of the virus
 ```
 
 If you want to see the source code of any function, just type its name without the braces. This way you can see how existing functions work, and hopefully later debug, and develop your own functions.
@@ -222,6 +240,20 @@ hello('MSBA')
 hello
 ```
 
+Here I declare two parameters with the default value of the second parameter set to 1.
+
+```{r}
+hello<-function(x,y=1){
+  for(i in 1:y){
+    print(paste("Hello ",x))    
+  }
+}
+
+hello('World')
+
+hello('World', 3)
+```
+
 ## Some Familiar Examples
 
 Below are a logistic regression and a support vector machine example. You should be familiar with these methods from your data mining class. Here, I will try to demonstrate how these analysis can easily be replicated with R. Do not worry if you can not follow through every step of the way, we will learn about the details later on.
@@ -230,7 +262,7 @@ Below are a logistic regression and a support vector machine example. You should
 
 Here I will use data from [UCLA Institute of digital research and education web site](http://www.ats.ucla.edu/stat/r/) which presents a very valuable resource for traditional statisitics.
 
-The dataset is about graduate school admissions. The dependent variable is acceptance into school, dependent variables are GRE, GPA scores, and prestige of undergrad institution. 
+The dataset is about graduate school admissions. The dependent variable is acceptance into school, independent variables are GRE, GPA scores, and prestige of undergrad institution. 
 
 ```{r}
 admitData <- read.csv("http://www.ats.ucla.edu/stat/data/binary.csv")
