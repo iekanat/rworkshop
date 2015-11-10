@@ -205,7 +205,7 @@ If you want to see the source code of any function, just type its name without t
 license
 ```
 
-Some functions (the most useful ones) take parameters. Here I am asking R to calculate the mean of numbers in vector c. c serves as a parameter to tell the mean function over which numbers to calculate the mean.
+Some functions (the most useful ones) take parameters. Here I am asking R to calculate the mean of numbers in vector C. C serves as a parameter to tell the mean function over which numbers to calculate the mean.
 
 ```{r}
 mean(C)
