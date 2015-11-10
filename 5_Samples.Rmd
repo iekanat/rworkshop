@@ -217,7 +217,7 @@ I want to demonstrate how Classification Trees can be fit without caret first, s
 
 Let us first fit a tree of a limited depth.
 
-```{r, fig.height=6}
+```{r, fig.height=6, fig.width=8}
 library(rpart) # Load necessary library
 rpart_1 <- rpart(Class ~ ., data = Training, 
   			control = rpart.control(maxdepth=2)) # Fit a shallow tree 
