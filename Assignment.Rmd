@@ -1,0 +1,53 @@
+---
+title: "Assignment"
+author: "Irfan Kanat"
+date: "11/09/2015"
+output: pdf_document
+---
+
+# R Workshop Assignment
+
+Before coming to the second session, please make sure you have the packages listed below installed and running.
+
+There may be some configuration problems with your installation, and you don't want to trouble shoot at the last minute. So act quickly on them and make sure you have a running environment before the workshop.
+
+
+## Installing rJava
+
+Some of the packages we use will require rJava to be installed. Unfortunately rJava is not available through CRAN. Follow the discussion [here to learn how to install rJava in Windows.](http://stackoverflow.com/a/7604469/3475252)
+
+Basically you need to do:
+
+1 - Add java jvm libraries to your R path.
+2 - Restart R
+3 - Install the rJava from R Forge
+
+```{r, eval=FALSE}
+install.packages('rJava',,'http://www.rforge.net/')
+```
+
+As I said, [look here for details.](http://stackoverflow.com/a/7604469/3475252) I can not provide you with specific instructions on this one as I don't use Windows. 
+
+
+## Installing caret Package
+
+I noticed some of you had difficulty installing caret package. Please try the code below. It should just work.
+
+```{r, eval=FALSE}
+install.packages("caret", dependencies = c("Depends", "Suggests"))
+```
+
+## Install Others
+
+**partykit:** Despite the fun name, the partykit is a visualization package for tree based models.
+
+**ggplot2:** This is the package we will use for visualization examples.
+
+**dplyr:** This is the package we will use for manipulation examples.
+
+**reshape:**
+
+```{r, eval=F}
+install.packages(c("partykit", "ggplot2", "dplyr", "reshape"))
+```
+
