@@ -156,10 +156,7 @@ logit_2_roc <- roc(am~prob, mtcars)
 plot(logit_2_roc)
 ```
 
-
-## Model Training - Discriminant Analysis with caret Package
-
-In this document I will present a classification example using caret package. The example presented here follows closely [the caret package vignette](https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf). I only made a few changes to fit it into the workshop's time frame. So if you need any clarification, you can read up more in the vignette.
+## Caret Package
 
 Caret package is a wrapper that brings together functionality from 27 packages. Caret supports [estimating over 150 models](http://topepo.github.io/caret/bytag.html) including bayesian, SVM, discriminant analysis, regressions, neural networks, and more.
 
@@ -177,6 +174,129 @@ Since so many packages involved, the installation takes a while.
 install.packages("caret", dependencies = c("Depends", "Suggests"))
 ```
 
+The main idea is comparing performance of alternate models and finding the best fit. Clarification of ambiguities: 
+ 1. Alternate models: test various model parameters
+ 2. Best fit: according to various metrics
+ 3. Compare performance: through resampling.
+
+## Model Training - Classification Trees with caret Package
+
+In this section, I will be presenting a classification tree with caret package. The example presented here follows closely [Kuhn's UseR 2013 presentation](https://www.r-project.org/nosvn/conferences/useR-2013/Tutorials/kuhn/user_caret_2up.pdf). I had to leave out significant portions of Kuhn's work to fit it into the scope of our workshop. Please refer to the original material for details.
+
+
+### Data
+
+We will use segmentationData from the caret package.
+
+```{r}
+library(caret) # Load necessary library
+data(segmentationData) # Obtain Dataset
+```
+
+We do not need the Cell identifiers.
+
+```{r}
+# Drop one column
+segmentationData <- segmentationData[,!(colnames(segmentationData)=='Cell')] 
+```
+
+The data has a variable "Case" to indicate Training, vs Testing observations. We will obtain subsets based on this variable.
+
+```{r}
+# Data set has a variable that separates training vs testing
+Training <- segmentationData[segmentationData$Case == 'Train', ] #$ One Way
+Testing <- subset(segmentationData, Case == 'Test') # Another way
+# Drop the now defunct Case variable
+Training <- Training[,!(colnames(Training)=='Case')] # Drop Case column
+Testing <- subset(Testing, select=-c(Case)) # Another way
+```
+
+### Classification Trees without Caret
+
+I want to demonstrate how Classification Trees can be fit without caret first, so that the contribution of caret's train function becomes clearer.
+
+Let us first fit a tree of a limited depth.
+
+```{r}
+library(rpart) # Load necessary library
+rpart_1 <- rpart(Class ~ ., data = Training, 
+  			control = rpart.control(maxdepth=2)) # Fit a shallow tree 
+rpart_1 # View results
+
+plot(rpart_1) # Visualization
+text(rpart_1) # Text
+```
+
+When you fit a tree with rpart, it conducts as many spits as possible, then use 10 fold cross validation to prune the tree.
+
+```{r}
+# Fit a larger tree and prune it 
+# Rpart does 10 fold cross validation
+rpart_2 <- rpart(Class ~ ., data = Training) 
+```
+
+partykit package provides beter plots for classification trees. 
+
+```{r}
+library(partykit)
+plot(as.party(rpart_2))
+```
+
+```{r}
+# Validate the model
+rpart_2Test <- predict(rpart_2, Testing, type='class')
+confusionMatrix(rpart_2Test, Testing$Class) # Get the benchmark$
+```
+
+
+## Model Tuning - Classification Trees with Caret
+
+caret package allows you to change tuning parameters and resampling strategies for the models. Below we instruct caret to use ROC curve with k-fold cross validation repeated 3 times to pick the best model.
+
+```{r}
+library(caret)
+##  Set Training Parameters
+# Triple Cross Validation
+cvCtrl <- trainControl(method = "repeatedcv", repeats = 3, # K-fold cross validation repeated thrice
+  				summaryFunction = twoClassSummary, classProbs = TRUE) # Class probabilities for ROC
+
+# Use caret to fit a model and fine tune the fit
+CarrotTree <- train(Class ~., data=Training, method='rpart', 
+					trControl=cvCtrl, metric = "ROC", tuneLength=30) # Change metric to ROC
+```
+
+Let us see the performance of models over various levels of tuning parameter.
+
+```{r}
+plot(CarrotTree)
+```
+
+Let us see the final model
+
+```{r}
+plot(as.party(CarrotTree$finalModel))
+```
+
+
+### Validate Using Testing Data
+
+Predict the class membership with test data and then plot out the confusion matrix for performance metrics of this model over test data.
+
+```{r}
+# Testing
+CarrotTree_Test <- predict(CarrotTree, Testing)
+head(CarrotTree_Test) # Compare
+head(Testing$Class) # and Contrast
+# Evaluate Model Performance
+confusionMatrix(CarrotTree, Testing$Class) 
+```
+
+
+## Model Training - Discriminant Analysis with caret Package
+
+In this section I will present a classification example using caret package. The example presented here follows closely [the caret package vignette](https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf). I only made a few changes to fit it into the workshop's time frame. So if you need any clarification, you can read up more in the vignette.
+
+
 ### Data
 
 We will use the sonar dataset from mlbench package. It has 208 observations of 60 predictor variables and a binary class variable as dependent. We do not know what these 60 variables are.
@@ -190,7 +310,7 @@ data(Sonar)
 
 ### SPLIT THE DATA
 
-Caret provides functionality to split the data into a training and a testing set while at the same time preserving the distribution of dependent variable.
+This dataset is not conveniently split as the previous set was, we need to create our own subsets. Caret provides functionality to split the data into a training and a testing set while at the same time preserving the distribution of dependent variable.
 
 createDataPartition function receives the dependent variable, proportion of training set in the whole of dataset as parameters.
 
@@ -259,5 +379,4 @@ Get confusion matrix (predicted vs actual) for performance reports.
 ```{r}
 confusionMatrix(data = plsPredict, Test$Class)
 ```
-
 
