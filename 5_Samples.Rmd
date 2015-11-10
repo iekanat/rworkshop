@@ -2,11 +2,11 @@
 title: "Example Analysis"
 author: "Irfan Kanat"
 date: "11/04/2015"
-output: 
+output:
   pdf_document:
-    fig_width: 4
     fig_height: 3
-    fig_caption: false
+    fig_width: 4
+    keep_tex: yes
 ---
 
 
@@ -217,7 +217,7 @@ I want to demonstrate how Classification Trees can be fit without caret first, s
 
 Let us first fit a tree of a limited depth.
 
-```{r}
+```{r, fig.height=6}
 library(rpart) # Load necessary library
 rpart_1 <- rpart(Class ~ ., data = Training, 
   			control = rpart.control(maxdepth=2)) # Fit a shallow tree 
@@ -237,7 +237,7 @@ rpart_2 <- rpart(Class ~ ., data = Training)
 
 partykit package provides beter plots for classification trees. 
 
-```{r}
+```{r, fig.height=8, fig.width=10}
 library(partykit)
 plot(as.party(rpart_2))
 ```
@@ -273,8 +273,9 @@ plot(CarrotTree)
 
 Let us see the final model
 
-```{r}
-plot(as.party(CarrotTree$finalModel))
+```{r, fig.height=8, fig.width=10, eval=FALSE}
+# Output omited to conserve space
+plot(as.party(CarrotTree$finalModel)) 
 ```
 
 
@@ -288,7 +289,7 @@ CarrotTree_Test <- predict(CarrotTree, Testing)
 head(CarrotTree_Test) # Compare
 head(Testing$Class) # and Contrast
 # Evaluate Model Performance
-confusionMatrix(CarrotTree, Testing$Class) 
+confusionMatrix(CarrotTree_Test, Testing$Class) 
 ```
 
 
