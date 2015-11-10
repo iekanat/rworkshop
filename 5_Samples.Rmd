@@ -175,6 +175,7 @@ install.packages("caret", dependencies = c("Depends", "Suggests"))
 ```
 
 The main idea is comparing performance of alternate models and finding the best fit. Clarification of ambiguities: 
+
  1. Alternate models: test various model parameters
  2. Best fit: according to various metrics
  3. Compare performance: through resampling.
