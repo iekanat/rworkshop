@@ -46,6 +46,7 @@
 \end{frame}
 }
 
+\AtBeginSubsection{\frame{\subsectionpage}}
 
 
 
@@ -457,8 +458,6 @@ ls(pattern='*_0') # partial match on object search
 rm('svm_0') # Remove an object from the workspace
 
 #rm(list=ls(pattern=ls())) # This would remove everything if ran
-
-
 @
 
 
@@ -553,7 +552,7 @@ We use read.csv() or read.csv2() commands to import the csv files.
 
 	<<eval=FALSE>>=
 		saveData <- read.csv("PathToCSV", header=TRUE, sep="," 
-		                     , quote="\"", )
+		                     , quote="\"")
 	@
 
 \end{frame}
@@ -852,6 +851,135 @@ Neural Networks: neuralnet package.
 
 \section{Sample Analysis and Visualizations}
 
+\subsection{Data Manipulation}
+
+\begin{frame}
+\frametitle{If Wishes Were Data...}
+
+We may wish for an ideal dataset, what we will invariably get is a mess.\vfill
+
+We often need to:
+\begin{itemize}
+  \item Combine datasets
+  \item Transform variables
+  \item Aggregate data
+\end{itemize}\vfill
+
+I am a data.tables person, but I will teach a tiny bit of dplyr for compatibility reasons.
+
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Data}
+We will investigate \href{http://data.worldbank.org/indicator/NY.GDP.MKTP.PP.CD}{GDP figures from world bank} and a separate dataset for continents.
+
+<<size='tiny'>>=
+GDP<-read.csv("GDP.csv")
+head(GDP, 3)
+@
+
+<<>>=
+Continents<-read.csv("continent.csv")
+head(Continents)
+@
+
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Merging Dataframes}
+
+Appending data.
+
+<<>>=
+rbind(Continents[1:3,], Continents[231:233,])
+cbind(Continents[1:3,], Continents[231:233,])
+@
+
+When you want to combine two data frames by a common column
+
+<<>>=
+cData <- merge(Continents, GDP, by = "ISO2")
+head(cData[,1:6])
+@
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Subsetting}
+
+<<results=-1>>=
+library(dplyr)
+# Subset of rows
+filter(cData, Continent == "OC" & X2011 > 23000) 
+# Subset of columns
+select(cData[1:3,], X2003:X2009) # All columns between X2003 and X2012
+select(cData[1:3,], -(ISO2:Country))
+@
+\end{frame}
+
+
+\begin{frame}[fragile]
+\frametitle{Aggregating by Groups}
+<<>>=
+# Create grouped data
+contiData <- group_by(cData, Continent)
+contiData
+@
+
+<<>>=
+# Create variables on the fly
+summarise(contiData, count=n(), GDP2012 = mean(X2012, na.rm = T))
+@
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{Reshape in Your Own Image}
+
+<<>>=
+cData_Long <- reshape(cData, varying=4:13, direction="long", sep="")
+# Drop the unnecessary id column
+cData_Long <- subset(cData_Long, select = -c(id, Country))
+# Drop the missing observations
+cData_Long <- na.exclude(cData_Long)
+# Get rid of empty levels
+cData_Long$ISO2 <- droplevels(cData_Long$ISO2)
+# Sort based on ISO2 and Year
+cData_Long<-cData_Long[order(cData_Long$ISO2,cData_Long$ISO2),]
+head(cData_Long, 3)
+@
+
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Transforming Variables}
+
+<<>>=
+# Basic Log Transform
+cData_Long$logGDP<-log(cData_Long$X)
+head(cData_Long)
+@
+
+<<>>=
+# ASSUMING YOUR DATA IS SORTED
+
+# More Interesting: Cumulative Sum By Groups
+cData_Long$cumGDP <- ave(cData_Long$X, cData_Long$ISO2, FUN=cumsum)
+@
+
+<<>>=
+# A function, given a vector, shifts every observation by 1 and drops the last one.
+lg <- function(x)c(NA,x[1:(length(x)-1)]) 
+lg(1:10) # See how it works
+# Run the function with group averages function
+cData_Long$lagGDP <- ave(cData_Long$X, cData_Long$ISO2, FUN=lg)
+head(cData_Long)
+@
+
+\end{frame}
+
 \subsection{Descriptive Visualizations}
 
 \begin{frame}
@@ -948,17 +1076,76 @@ ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +
 
 \end{frame}
 
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Bonus! Map Visualizations}
+<<tidy=F>>=
+## Display GDP Data on Map
+
+library(rworldmap) # Install if necessary
+
+cDataL2011 <- filter(cData_Long, time==2011)
+# Rename the columns
+colnames(cDataL2011)[4] <- "GDP"
+
+# Turn into map
+cDataL2011<- joinCountryData2Map(cDataL2011, joinCode = "ISO2",
+                                 nameJoinColumn = 'ISO2')
+
+@
+
+<<'map0', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+mapCountryData(cDataL2011, nameColumnToPlot = "GDP")
+@
+
+<<'map1', fig.width=6, fig.height=4, out.width='.7\\linewidth'>>=
+mapCountryData(cDataL2011, nameColumnToPlot = "GDP", mapRegion = "eurasia")
+@
+
+\end{frame}
 
 
 % Linear Regression
 \subsection{Modeling}
 
 \begin{frame}
+\frametitle{Formula Interface}
+
+Pay close attention to how we specify the model. \vfill
+
+
+
+\begin{alertblock}{R Model}
+		Y $\sim x_1 + x_2$
+\end{alertblock}
+\vfill
+
+This basic structure will remain constant across many R packages.\vfill 
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Nifty Tricks with Formula Interface}
+
+If you have lots of variables use the shortcut `.'.
+
+\hspace{4em} mpg $\sim$ . \vfill
+
+You can do transformations on the fly, no need to create variables.
+
+\hspace{4em} log(mpg + 1) ~ .\vfill
+
+Dummy variables.
+
+\hspace{4em} log(mpg + 1) ~ factor(gears) \vfill
+
+\end{frame}
+
+
+\begin{frame}
 \frametitle{Multiple Regression}
 
 We will keep using motor trends data set.\vfill
-
-Pay close attention to how we specify the model. \vfill
 
 \begin{alertblock}{Formula}
 	\[
@@ -966,15 +1153,13 @@ Pay close attention to how we specify the model. \vfill
 	\]
 \end{alertblock}
 \vfill
-
 \begin{alertblock}{R Model}
-	\[
+    \[
 		Y \sim x_1 + x_2
 	\]
 \end{alertblock}
 \vfill
 
-This basic structure will remain constant across many R packages.\vfill 
 
 \end{frame}
 
@@ -1105,6 +1290,8 @@ confusionMatrix(table(mtcars[,c("am", "pred")]))
 
 \end{frame}
 
+% https://www.r-project.org/nosvn/conferences/useR-2013/Tutorials/kuhn/user_caret_2up.pdf
+
 
 % K means clustering?
 
@@ -1113,7 +1300,7 @@ confusionMatrix(table(mtcars[,c("am", "pred")]))
 % SVM
 
 \begin{frame}[fragile]
-\frametitle{Caret Package}
+\frametitle{caret Package}
 
 The Caret package is a wrapper that combines functionality from 27 R packages.\vfill
 
@@ -1122,7 +1309,7 @@ Functions Provided:
 	\item Visualization
 	\item Data Manipulation
 	\item Model Training \& Selection
-	\item Parallel Processing
+	\item \emph{Parallel Processing}
 \end{itemize}
 \vfill
 
@@ -1133,6 +1320,108 @@ install.packages("caret", dependencies = c("Depends", "Suggests"))
 @
 
 For this part of the exercise I will focus on Caret Package, following its \href{https://cran.r-project.org/web/packages/caret/vignettes/caret.pdf}{vignette}.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{What does caret Do?}
+
+Estimate model parameters \vfill
+Tune variables through re-sampling strategies \vfill
+Calculate performance 
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Classification Trees}
+
+For this exercise I will be using \href{https://www.r-project.org/nosvn/conferences/useR-2013/Tutorials/kuhn/user_caret_2up.pdf}{Kuhn's `Predictive Modeling with R and caret Package'} examples.\vfill
+
+We will fit a classification tree on segmentationData dataset.\vfill
+
+Dataset is of segmentation of some cell images.\vfill
+
+The data is 2019 observations of  61 variables.\vfill
+
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Classification Trees in R: Data}
+
+<<>>=
+# Obtain Dataset
+data(segmentationData)
+segmentationData <- segmentationData[,!(colnames(segmentationData)=='Cell')] # Drop one column
+@
+
+<<>>=
+# Data set has a variable that separates training vs testing
+Training <- segmentationData[segmentationData$Case == 'Train', ] #$ One Way
+Testing <- subset(segmentationData, Case == 'Test') # Another way
+Training <- Training[,!(colnames(Training)=='Case')] # Drop Case column
+Testing <- subset(Testing, select=-c(Case)) # Another way
+@
+\end{frame}
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Classification Trees in R}
+<<>>=
+library(rpart) # Load necessary library
+rpart_1 <- rpart(Class ~ ., data = Training, 
+				control = rpart.control(maxdepth=2)) # Fit a shallow tree 
+rpart_1 # View the results
+@
+
+<<>>=
+# Visualize the Tree
+plot(rpart_1)
+text(rpart_1)
+@
+
+<<>>=
+# Fit a larger tree and prune it 
+# rpart does 10 fold cross validation
+rpart_2 <- rpart(Class ~ ., data = Training) 
+plot(rpart_2)
+text(rpart_2)
+@
+
+<<>>=
+# Validate the model
+rpart_2Test <- predict(rpart_2, Testing, type='class')
+confusionMatrix(rpart_2Test, Testing$Class) # Get the benchmark$
+@
+\end{frame}
+
+
+\begin{frame}[fragile, allowframebreaks]
+\frametitle{Pruning Trees with caret}
+<<>>=
+library(caret)
+##  Set Training Parameters
+# Triple Cross Validation
+cvCtrl <- trainControl(method = "repeatedcv", repeats = 3, 
+					summaryFunction = twoClassSummary, classProbs = TRUE)
+
+# Use caret to fine tune the fit
+CarrotTree <- train(Class ~., data=Training, method='rpart', 
+					trControl=cvCtrl, metric = "ROC", tuneLength=30)
+@
+
+<<>>=
+plot(CarrotTree)
+@
+
+<<>>=
+# Testing
+CarrotTree_Test <- predict(CarrotTree, Testing)
+
+confusionMatrix(CarrotTree, Testing$Class) 
+#$ I use these dollar signs so the syntax highlighting works properly in Sublime text.
+@
+
 \end{frame}
 
 
@@ -1207,6 +1496,16 @@ head(Test$Class) # View actual$
 confusionMatrix(data = plsPredict, Test$Class) #$
 
 @
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Read caret Documentations}
+
+I provide here a brief glimpse into what caret is capable of.\vfill
+
+Do read for yourself.
 
 \end{frame}
 

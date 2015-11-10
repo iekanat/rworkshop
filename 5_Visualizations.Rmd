@@ -120,13 +120,56 @@ ggplot(mtcars, aes(x=hp, y=mpg)) +
   ggtitle('GGPlot FTW!') # Add a title
 ```
 
-### BONUS: Bar Charts 
+### Bar Charts 
 
 You use bar charts when you want to visualize the relationship of a continuous variable over a categorical variable (eg. gender-height). Here I plot mean mpg over two categorical variables. 
 
 ```{r}
 ggplot(mtcars,aes(x=factor(gear),y=mpg,fill=factor(vs)), color=factor(vs)) +  
   stat_summary(fun.y=mean, position=position_dodge(), geom="bar")
+```
+
+### Bonus! World Map Visualizations
+
+After having mingled that GDP data so much, I could not help but plot the results on a map. Here is how:
+
+Process data into a map.
+
+```{r}
+# Load the Library
+library(rworldmap) # Install if necessary
+
+# Get the dataset
+cData_Long<-read.csv("cDataLong.csv")
+
+# Subset
+cDataL2011 <- subset(cData_Long, time==2011)
+
+# Get a taste
+head(cDataL2011)
+
+# Turn into map
+cDataL2011<- joinCountryData2Map(cDataL2011, joinCode = "ISO2",
+                                 nameJoinColumn = 'ISO2')
+```
+
+Plot the world map.
+
+```{r, fig.width=6, fig.height=4}
+mapCountryData(cDataL2011, nameColumnToPlot = "GDP")
+```
+
+Focus on Eurasia.
+
+```{r, fig.width=6, fig.height=4}
+mapCountryData(cDataL2011, nameColumnToPlot = "GDP", mapRegion = "eurasia")
+```
+
+Plot a categorical variable as color and continuous as size.
+
+```{r}
+mapDevice() # Initialize the map
+mapBubbles(dF=cDataL2011, nameZSize="GDP", nameZColour="Continent", colourPalette="rainbow", oceanCol="lightblue", landCol="wheat", alpha = .8)
 ```
 
 ## caret and Visualizations

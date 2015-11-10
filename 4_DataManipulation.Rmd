@@ -1,0 +1,239 @@
+---
+title: "Data Manipulation"
+author: "Irfan Kanat"
+date: "11/09/2015"
+output: pdf_document
+---
+
+In this document, I will try to walk you through some simple data manipulatione examples. As one might guess, data manipulation is sometimes more of an art, than science. Thus, what I can effectively teach you will be limited. We will learn some basic manipulations with dplyr package and vanilla R. dplyr provides a set of sensible functions to throw data around.
+
+```{r, message=FALSE}
+library(dplyr)
+```
+
+We will conduct our exercise on Worldbank GDP figures and continent information.
+
+The GDP figures data is in GDP.csv. Let us read in the file.
+
+```{r}
+GDP<-read.csv("GDP.csv")
+head(GDP)
+```
+
+As you can see, the data is in what we call the wide format. Each row is a country and observations over time are in columns.
+
+Let us also get the second data set: Continents and country codes.
+
+```{r}
+Continents<-read.csv("continent.csv")
+head(Continents)
+```
+
+## Combine Two Datasets
+
+The most basic operation you can do with two datasets is to combine them. If you want to append new observations to an existing dataset, use rbind. If you want to append new variables to an existing dataset, use cbind. Note that the columns/rows need to be compatible in such combinations.
+
+```{r}
+# Append one dataset to another
+# Append rows
+rbind(Continents[1:3,] ,Continents[231:233,])
+# Append columns
+cbind(Continents[1:3,] ,Continents[231:233,])
+```
+
+
+If you want to combine two datasets based on the values of a common column however, you will need to do a merge. Merging is similar to a join operation in SQL if you are familiar with it. 
+
+Below is the syntax for merge()
+
+```{r, eval=F}
+merge(x, y, by = intersect(names(x), names(y)),
+      by.x = by, by.y = by, all = FALSE, all.x = all, all.y = all,
+      sort = TRUE, suffixes = c(".x",".y"))
+```
+
+As you can see, a lot of the parameters are optional (have default values). Let us use merge to join Continents dataset to GDP dataset.
+
+```{r}
+cData <- merge(Continents, GDP)
+head(cData)
+```
+
+I did not need to specify which column to merge on as by has a default value of intersect(names(x), names(y)). This means, if there are common column names between two datasets the two will be merged on common column names.
+
+Let us go over some of the more commonly used parameters.
+
+by, by.x, by.y: column name to merge on between quotation marks. If the two datasets have different names, use by.x and by.y to separately specify the column names.
+
+```{r, eval=FALSE}
+merge(Continents, GDP, by = "ISO2")
+```
+
+all, all.x, all.y: It determines what to do with rows that can not be matched in both datasets. From an SQL perspective, the all parameters specify the type of join operation. all.x = TRUE left join (keep rows from left table even if not matched), all.y = TRUE left join, and all = TRUE for an outer join. 
+
+## Subset Rows Based on Column Values
+
+If you want to select certain rows of output based on a column, this is what you do. When we wanted to filter certain observations in the first session we used indexing with logical operations before. 
+
+Let us select observations in Oceania first.
+
+First let us see how this is done in R:
+
+```{r}
+# displaying the first 6 columns to conserve space
+# !is.na bit is required due to how R matches the == with NA's
+cData[cData$Continent == "OC" & !is.na(cData$Continent),1:6] 
+```
+
+A better way is to subset the data (subset is part of the base package):
+
+```{r}
+subset(cData[,1:6], Continent == "OC")
+```
+
+With dplyr:
+
+```{r}
+filter(cData[,1:6], Continent == "OC")
+```
+
+You can also filter based on multiple columns. Let us say we are interested in countries in Oceania that are rich (GDP greater than 3rd quartile).
+
+```{r}
+cData[cData$Continent == "OC" & !is.na(cData$Continent) & cData$X2011 > 23000 & !is.na(cData$X2011),]
+```
+
+I believe you would agree that, it is not very convenient. Filter to the rescue.
+
+```{r}
+filter(cData, Continent == "OC" & X2011 > 23000)
+```
+
+
+
+## Selecting Certain Columns
+
+Let us say we are interested only in the GDP figures and not in any of the country identifiers. We would want to select only certain columns.
+
+Traditional R ways:
+
+```{r}
+# Limiting number of rows to 3 to conserve space
+cData[1:3,4:13] # Indexing by column numbers
+cData[1:3,-(1:3)] # Negative indexing
+cData[1:3,grep("X", colnames(cData))] # Another way based on partial matching column name
+```
+
+subset can also handle this:
+
+```{r}
+subset(cData[1:3,], select = -c(ISO2, Continent, Country)) # Drop these columns
+```
+
+dplyr way:
+
+```{r}
+select(cData[1:3,], X2003:X2012) # All columns between X2003 and X2012
+select(cData[1:3,], -(ISO2:Country))
+```
+
+## Aggregating based on Groups
+
+Let us say we want to calculate the average GDP per continent in 2011 and the number of countries in each continent. 
+
+R way:
+
+```{r}
+Cont1 <- aggregate(cData$X2011 ~ cData$Continent, FUN=function(x)mean(x, na.rm=T))
+Cont1
+Cont2 <- aggregate(cData$X2011 ~ cData$Continent, FUN=function(x) length(x))
+Cont2
+Cont <- merge(Cont1, Cont2, by='cData$Continent')
+Cont
+rm(Cont1, Cont2)
+```
+
+dplyr way:
+
+```{r}
+# Create grouped data
+contiData <- group_by(cData, Continent)
+contiData
+# Create variables on the fly
+summarise(contiData, count=n(), GDP2012 = mean(X2012, na.rm = T))
+```
+
+## Converting Data to Long Format
+
+So far our data had remained in wide format, yet for most statistical analysis it is more convenient to have it in long format.
+
+Let us learn the use of reshape function. Below is the syntax.
+
+```{r, eval = F}
+reshape(data, varying = NULL, v.names = NULL, timevar = "time",
+        idvar = "id", ids = 1:NROW(data),
+        times = seq_along(varying[[1]]),
+        drop = NULL, direction, new.row.names = NULL,
+        sep = ".",
+        split = if (sep == "") {
+            list(regexp = "[A-Za-z][0-9]", include = TRUE)
+        } else {
+            list(regexp = sep, include = FALSE, fixed = TRUE)}
+        )
+```
+
+data: data.frame to be reshaped.
+varying: names of variables that refer to single variables in long format.
+idvar: identifier for observations.
+
+```{r}
+cData_Long <- reshape(cData, varying=4:13, direction="long", sep="")
+head(cData_Long)
+# Drop the unnecessary id column
+cData_Long <- subset(cData_Long, select = -c(id, Country))
+# Drop the missing observations
+cData_Long <- na.exclude(cData_Long)
+# Get rid of empty levels
+cData_Long$ISO2 <- droplevels(cData_Long$ISO2)
+# Rename variable X to GDP
+colnames(cData_Long)[4] <- "GDP"
+# Sort based on ISO2 and Year
+cData_Long<-cData_Long[order(cData_Long$ISO2,cData_Long$ISO2),]
+head(cData_Long)
+```
+
+## Traditional Transformations
+
+Often times we will find ourselves creating transformed variables. For logs and other linear transformations, our job is easy. We can just use the function name like so:
+
+```{r}
+cData_Long$logGDP<-log(cData_Long$GDP)
+head(cData_Long)
+```
+
+
+What is more intriguing is to create transformations based on a grouping variable such as cumulative sums for each country. There are many ways to do this, here is one that is done with vanilla R:
+
+```{r}
+# ASSUMING YOUR DATA IS SORTED
+cData_Long$cumGDP <- ave(cData_Long$GDP, cData_Long$ISO2, FUN=cumsum)
+```
+
+Or lagged values for each country. 
+
+```{r}
+# ASSUMING YOUR DATA IS SORTED
+# Write a function to lag
+# A function, given a vector, shifts every observation by 1 and drops the last one.
+lg <- function(x) c(NA,x[1:(length(x)-1)]) 
+lg(1:10) # See how it works
+# Run the function with group averages function
+cData_Long$lagGDP <- ave(cData_Long$GDP, cData_Long$ISO2, FUN=lg)
+head(cData_Long)
+```
+
+Save dataset for later use.
+
+```{r}
+write.csv(cData_Long, file="cDataLong.csv", row.names=F)
+```
