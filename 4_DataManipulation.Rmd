@@ -237,3 +237,8 @@ Save dataset for later use.
 ```{r}
 write.csv(cData_Long, file="cDataLong.csv", row.names=F)
 ```
+
+
+------
+
+![Creative Commons 4](figures/cc.png) How I Learned to Stop Worrying and Love the R Console by [Irfan E Kanat](http://irfankanat.com) is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). Based on a work at [http://github.com/iekanat/rworkshop](http://github.com/iekanat/rworkshop).

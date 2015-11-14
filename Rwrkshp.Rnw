@@ -2,6 +2,7 @@
 %\usepackage{times}  % fonts are up to you
 \usepackage{graphicx}
 \usepackage{multirow, booktabs} % Tables
+\usepackage{wrapfig} % License page, wrap text around image.
 \usepackage[T1]{fontenc}
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
@@ -67,10 +68,15 @@ rm(list=ls()) # Clean the workspace
 @
 
 \title[R Workshop]{How I Learned to Stop Worrying and Love the R Console}
-\author{Irfan Kanat \\
-    Department of Information Systems \\
-    Arizona State University 
-}
+
+\author{Irfan E Kanat}
+
+\institute{Department of Information Systems\\ 
+W.P. Carey School of Business\\
+Arizona State University}
+
+\titlegraphic{\vfill \hfill \hyperlink{license}{\includegraphics{figures/cc.png}}}
+
 \date{\today}
 
 
@@ -1136,11 +1142,11 @@ If you have lots of variables use the shortcut `.'.
 
 You can do transformations on the fly, no need to create variables.
 
-\hspace{4em} log(mpg + 1) ~ .\vfill
+\hspace{4em} log(mpg + 1) $\sim$ .\vfill
 
 Dummy variables.
 
-\hspace{4em} log(mpg + 1) ~ factor(gears) \vfill
+\hspace{4em} log(mpg + 1) $\sim$ factor(gears) \vfill
 
 \end{frame}
 
@@ -1432,6 +1438,7 @@ confusionMatrix(CarrotTree_Test, Testing$Class)
 \vfill
 	Here we will conduct a PLS DA with caret
 \vfill
+    The example here closely follows the Caret Vignette example.
 
 \end{frame}
 
@@ -1585,5 +1592,17 @@ R Programming is quirky, learn about efficient R programming.
 	\end{center}
 \end{frame}
 
+\begin{frame}[label=license]
+    \frametitle{License}
+
+\begin{wrapfigure}{l}{0.25\textwidth} %this figure will be at the right
+    \centering
+    \includegraphics[width=0.25\textwidth]{figures/CCBig.png}
+\end{wrapfigure}
+
+How I Learned to Stop Worrying and Love the R Console by \href{http://irfankanat.com}{Irfan E Kanat} is licensed under a \href{http://creativecommons.org/licenses/by/4.0/}{Creative Commons Attribution 4.0 International License}. Based on a work at \href{http://github.com/iekanat/rworkshop}{http://github.com/iekanat/rworkshop}.
+
+
+\end{frame}
 
 \end{document}

@@ -211,7 +211,7 @@ Some functions (the most useful ones) take parameters. Here I am asking R to cal
 mean(C)
 ```
 
-You can directly use the output of one function with another. Here I will calculate the mean by first summing the c vector then dividing the sum by number of elements.
+You can directly use the output of one function with another. Here I will calculate the mean by first summing the C vector then dividing the sum by number of elements.
 
 ```{r}
 sum(C)/length(C)
@@ -328,3 +328,7 @@ R CMD BATCH my_script.R
 
 
 This concludes our introduction.
+
+------
+
+![Creative Commons 4](figures/cc.png) How I Learned to Stop Worrying and Love the R Console by [Irfan E Kanat](http://irfankanat.com) is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). Based on a work at [http://github.com/iekanat/rworkshop](http://github.com/iekanat/rworkshop).

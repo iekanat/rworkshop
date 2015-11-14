@@ -111,3 +111,7 @@ Earlier versions can be imported with 'foreign' package's read.dta() function.
 SPSS sav files can be imported with 'foreign' package's read.spss() function.
 
 Exported por files can be imported with 'Hmisc' package's spss.get() function.
+
+------
+
+![Creative Commons 4](figures/cc.png) How I Learned to Stop Worrying and Love the R Console by [Irfan E Kanat](http://irfankanat.com) is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). Based on a work at [http://github.com/iekanat/rworkshop](http://github.com/iekanat/rworkshop).
