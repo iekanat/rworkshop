@@ -27,3 +27,8 @@ Currently I only uploaded the files related to the first session as I plan to ch
 [Presentation](Rwrkshp.pdf) is the slide deck for the whole workshop.
 
 [Assignment](Assignment.pdf) is a short list of tasks to be carried out prior to coming to the second session.
+
+-------
+
+
+![Creative Commons 4](figures/cc.png) How I Learned to Stop Worrying and Love the R Console by [Irfan E Kanat](http://irfankanat.com) is licensed under a [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/). Based on a work at [http://github.com/iekanat/rworkshop](http://github.com/iekanat/rworkshop).
