@@ -1540,6 +1540,41 @@ Do read for yourself.
 \section{Reporting}
 
 \begin{frame}
+\frametitle{Markdown and R Markdown}
+
+Think HTML simplified. \vfill
+
+Add (R) code into it. \vfill
+
+Stir well with knitr \vfill
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{R Markdown Cheat Sheet}
+
+\#   \Huge{\textbf{H1}}
+
+\#\#  \Large{\textbf{H2}}
+
+\#\#\# \textbf{H3} \vfill
+
+*{\textit{Italic}}*
+
+**{\textbf{Bold}}**
+
+***{\textit{ \textbf{Bold Italic}}}*** \vfill
+
+\begin{verbatim}
+``` { r, options }
+R CODE HERE
+```
+\end{verbatim}
+
+\end{frame}
+
+
+\begin{frame}
 \frametitle{Professional Looking Documents}
 
 All the documentation of this workshop has been prepared in R Studio. \vfill
@@ -1572,7 +1607,7 @@ RTFM\footnote{Read the Friendly Manual}: Documentation is your friend, read the 
 
 For tutorials: \href{http://www.ats.ucla.edu/stat/r/}{Institute For Digital Research and Education, UCLA} \vfill
 
-For questions: StackExchange\footnote{Word of caution, \href{http://stackoverflow.com/help/how-to-ask}{pay attention to how you ask your questions}. It is more important than you realize.}
+For questions: StackExchange\footnote{Word of caution, \href{http://stackoverflow.com/help/how-to-ask}{pay attention to how you ask your questions}. It is more important than you realize!}
 \begin{itemize}
 \item \href{http://stats.stackexchange.com/}{Cross Validated specializes on Statistics}
 \item \href{http://stackoverflow.com/}{Stack Overflow for R programming}
