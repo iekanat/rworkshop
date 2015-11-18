@@ -1553,9 +1553,9 @@ Stir well with knitr \vfill
 \begin{frame}[fragile]
 \frametitle{R Markdown Cheat Sheet}
 
-\#   \Huge{\textbf{H1}}
+\#   {\Huge \textbf{H1}}
 
-\#\#  \Large{\textbf{H2}}
+\#\#  {\Large \textbf{H2}}
 
 \#\#\# \textbf{H3} \vfill
 
@@ -1584,6 +1584,20 @@ Look into the Rmd documents to see how this was done. \vfill
 summary() function does not provide the best looking model summaries.
 Try the texreg package (do as I say, not as I do).\vfill
 
+Use themes for your plots.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Other Reporting Alternatives}
+
+Sweave: \LaTeX \vfill
+
+Beamer: \LaTeX ~ presentations \vfill
+
+Shiny: Web Applications \vfill
+
 \end{frame}
 
 
@@ -1595,6 +1609,7 @@ Try the texreg package (do as I say, not as I do).\vfill
 		\vfill
 	\end{center}
 \end{frame}
+
 
 \section{Where to Go Next?}
 
